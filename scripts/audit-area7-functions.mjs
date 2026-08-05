@@ -43,6 +43,29 @@ function hasAny(source, patterns) {
 
 function classifyFunction(name, source) {
   const lower = `${name}\n${source}`.toLowerCase();
+  const authSignals = {
+    requiresAdminUser: /requireAdminUser\s*\(/.test(source),
+    requiresAuthenticatedUser: /requireAuthenticatedUser\s*\(/.test(source),
+    requiresOwnerOrAdmin: /requireOwnerOrAdmin\s*\(/.test(source),
+    requiresSignedInternal: /requireSignedInternalInvocation\s*\(/.test(source),
+    requiresAdminOrSignedInternal: /requireAdminOrSignedInternalInvocation\s*\(/.test(source),
+    authMe: /base44\.auth\.me\s*\(/.test(source),
+    webhookSignature: /signature|constructEvent|validateTwilioSignature|X-Twilio-Signature|stripe\.webhooks|shared secret|webhook secret/i.test(source),
+  };
+  const authorization = authSignals.requiresAdminOrSignedInternal
+    ? "admin_or_signed_internal"
+    : authSignals.requiresSignedInternal
+      ? "signed_internal"
+      : authSignals.requiresOwnerOrAdmin
+        ? "owner_or_admin"
+        : authSignals.requiresAdminUser
+          ? "admin"
+          : authSignals.requiresAuthenticatedUser || authSignals.authMe
+            ? "authenticated"
+            : authSignals.webhookSignature
+              ? "signed_webhook_or_provider_verified"
+              : "no_obvious_auth_guard";
+
   return {
     critical: CRITICAL_FUNCTIONS.has(name),
     touchesTwilio: /twilio|sms|phone|call/.test(lower),
@@ -50,6 +73,8 @@ function classifyFunction(name, source) {
     touchesStripe: /stripe|checkout|billing|invoice|subscription/.test(lower),
     publicWebhook: /webhook|statuscallback|twilioml|resend webhook/.test(lower),
     scheduled: /scheduled|cron|daily|every|processor|process/.test(lower),
+    authorization,
+    ...authSignals,
   };
 }
 
@@ -73,7 +98,7 @@ export function collectFunctionAudit({ root = functionsRoot } = {}) {
     if (deployed.path && !/Deno\.serve\s*\(/.test(deployedSource) && !/import ['\"]\.\/main\.ts['\"]/.test(deployedSource)) findings.push("deployed_source_has_no_Deno_serve_or_wrapper");
     if (entrySource && mainSource && !/import ['\"]\.\/main\.ts['\"]/.test(entrySource) && !/STALE|deployed source of truth|Do NOT edit/i.test(mainSource)) findings.push("entry_main_dual_source_without_clear_source_of_truth");
     if (classification.critical && !hasAny(combinedSource, [/CommunicationEvent/, /logAutomationExecution/, /AutomationExecutionLog/, /calculateDeploymentHealth/, /provider_message_id/, /StatusCallback/])) findings.push("critical_function_missing_observability_marker");
-    if ((classification.touchesTwilio || classification.touchesResend || classification.touchesStripe) && /sk_live_|rk_live_|SG\.|AC[a-f0-9]{30,}|xox[baprs]-/i.test(combinedSource)) findings.push("possible_hardcoded_provider_secret");
+    if ((classification.touchesTwilio || classification.touchesResend || classification.touchesStripe) && /sk_live_|rk_live_|SG\.|AC[a-fA-F0-9]{30,}|xox[baprs]-/.test(combinedSource)) findings.push("possible_hardcoded_provider_secret");
     if (classification.touchesTwilio && !hasAny(combinedSource, [/TWILIO_/, /StatusCallback/, /validateTwilio/i, /twilioFetch/])) findings.push("twilio_function_missing_provider_guard_marker");
     if (classification.touchesResend && !hasAny(combinedSource, [/RESEND_/, /resendFetch/, /receiveResendWebhook/, /emailDeliverability/i])) findings.push("resend_function_missing_provider_guard_marker");
     if (classification.publicWebhook && !hasAny(combinedSource, [/signature/i, /validate/i, /twilio/i, /resend/i, /shared secret/i, /AUTOMATION_SHARED_SECRET/])) findings.push("webhook_missing_validation_marker");
@@ -99,6 +124,10 @@ export function summarizeAudit(rows) {
     provider_touching_functions: rows.filter((row) => row.touchesTwilio || row.touchesResend || row.touchesStripe).length,
     webhooks: rows.filter((row) => row.publicWebhook).length,
     scheduled_or_processor_functions: rows.filter((row) => row.scheduled).length,
+    by_authorization: rows.reduce((acc, row) => {
+      acc[row.authorization] = (acc[row.authorization] || 0) + 1;
+      return acc;
+    }, {}),
   };
   const findings = rows.flatMap((row) => row.findings.map((finding) => ({ function: row.name, finding })));
   return { summary, findings, rows };

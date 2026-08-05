@@ -308,7 +308,7 @@ export default function WorkflowSection() {
           {/* CTA below flow */}
           <div className="text-center mt-10">
             <CSButton
-              to="/store"
+              to="/pricing"
               variant="primary"
               size="md"
               iconRight={ArrowRight}

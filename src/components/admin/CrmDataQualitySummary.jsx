@@ -82,7 +82,7 @@ export default function CrmDataQualitySummary() {
     try {
       const [leadRows, websiteRows, runRows, suppressedRows] = await Promise.all([
         base44.entities.Leads.filter({}, '-created_date', 1000).catch(() => []),
-        base44.asServiceRole.entities.WebsiteLead.filter({}, '-created_date', 1000).catch(() => []),
+        base44.admin.entities.WebsiteLead.filter({}, '-created_date', 1000).catch(() => []),
         base44.entities.CommunicationEvent.filter({ context_type: 'crm_quality_backfill' }, '-created_date', 25).catch(() => []),
         base44.entities.CommunicationEvent.filter({ event_type: 'outbound_suppressed' }, '-created_date', 100).catch(() => []),
       ]);

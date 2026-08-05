@@ -336,8 +336,8 @@ export default function ProofPage() {
               <Link to="/start" className="cs-btn-primary cs-cta-glow" style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.875rem" }}>
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link to="/store" className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
-                Browse Automation Store
+              <Link to="/pricing" className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
+                Compare Packages
               </Link>
               <Link to="/book" className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors text-xs">
                 Not sure? Book a Free Audit

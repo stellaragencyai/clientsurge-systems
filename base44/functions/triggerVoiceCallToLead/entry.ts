@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
+import { AuthGuardError, requireAdminOrSignedInternalInvocation } from "../_shared/authGuards.js";
 
 function secureJson(data = {}, init = {}) {
   return new Response(JSON.stringify(data), {
@@ -64,6 +65,8 @@ async function initiateElevenLabsCall(apiKey, payload, attempt = 1) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    await requireAdminOrSignedInternalInvocation(base44, req);
+
     const { lead_id } = await req.json();
 
     if (!lead_id) {
@@ -180,6 +183,10 @@ Deno.serve(async (req) => {
       call_sid: result?.call_sid,
     });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return secureJson({ error: error.message, code: error.code }, { status: error.status });
+    }
+
     console.error('[triggerVoiceCallToLead] Error:', error.message);
     return secureJson({ error: error.message }, { status: 500 });
   }

@@ -82,7 +82,7 @@ function ClientPlanCard({ config, onUpdate }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await base44.asServiceRole.entities.ClientAccountConfig.update(config.id, {
+      await base44.admin.entities.ClientAccountConfig.update(config.id, {
         plan_type: form.plan_type,
         plan_status: form.plan_status,
         feature_flags: { ...getDefaultFeatureFlags(form.plan_type), ...form.feature_flags },
@@ -248,7 +248,7 @@ export default function SaaSPlanManagerPanel() {
       const filter = {};
       if (planFilter) filter.plan_type = planFilter;
       if (statusFilter) filter.plan_status = statusFilter;
-      const res = await base44.asServiceRole.entities.ClientAccountConfig.filter(filter, '-created_date', PAGE_SIZE + 1, page * PAGE_SIZE);
+      const res = await base44.admin.entities.ClientAccountConfig.filter(filter, '-created_date', PAGE_SIZE + 1, page * PAGE_SIZE);
       setConfigs(res || []);
     } catch (err) {
       console.error('Failed to fetch client configs:', err);

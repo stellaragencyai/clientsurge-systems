@@ -1,4 +1,6 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 
 /**
  * Get Sales Automation Metrics: Dashboard endpoint returning conversion, funnel, and attribution data
@@ -7,13 +9,15 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    await requireAdminUser(base44);
     const url = new URL(req.url);
-    const clientId = url.searchParams.get('client_id');
-    const clientProjectId = url.searchParams.get('client_project_id');
-    const period = url.searchParams.get('period') || '30d';
+    const payload = req.method === 'GET' ? {} : await req.json().catch(() => ({}));
+    const clientId = payload.client_id || url.searchParams.get('client_id');
+    const clientProjectId = payload.client_project_id || url.searchParams.get('client_project_id');
+    const period = payload.period || url.searchParams.get('period') || '30d';
 
     if (!clientProjectId) {
-      return Response.json({ error: 'client_project_id required' }, { status: 400 });
+      return secureJson({ error: 'client_project_id required' }, { status: 400 });
     }
 
     console.log('[getSalesAutomationMetrics] Fetching metrics for', {
@@ -103,7 +107,7 @@ Deno.serve(async (req) => {
       ab_tests_running: summary.ab_tests_active,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       summary,
       funnel: funnelData,
@@ -112,7 +116,11 @@ Deno.serve(async (req) => {
       signals,
     });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return secureJson({ error: error.message, code: error.code }, { status: error.status });
+    }
+
     console.error('[getSalesAutomationMetrics] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: 'Unable to load sales automation metrics' }, { status: 500 });
   }
 });

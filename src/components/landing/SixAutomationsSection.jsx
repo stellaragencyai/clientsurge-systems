@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ShoppingCart, ChevronDown } from "lucide-react";
+import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ArrowRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
@@ -45,9 +45,9 @@ export default function SixAutomationsSection() {
           viewport={{ once: true, margin: "-100px" }}
         >
           <CSSectionHeader
-            eyebrow="The Automation Store"
+            eyebrow="Automation Stack"
             title="Six Systems That Protect Every Lead"
-            subtitle="Browse the automation stack — capture, recover, follow up, book, request reviews, and reactivate. Add individual modules or pick a full system. No demos required."
+            subtitle="Review the automation stack — capture, recover, follow up, book, request reviews, and reactivate — then choose the packaged system that fits your lead flow."
             align="center"
             theme="light"
           />
@@ -87,12 +87,12 @@ export default function SixAutomationsSection() {
               <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>
               <p style={{ color: "#1e293b", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
               <Link
-                to={`/store?focus=${encodeURIComponent(id)}`}
+                to={`/pricing?focus=${encodeURIComponent(id)}`}
                 onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
                 className="cs-btn-outline mt-4 w-full inline-flex items-center justify-center gap-1.5"
                 style={{ padding: "0.55rem 1rem", fontSize: "0.78rem" }}
               >
-                <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                <ArrowRight className="w-3.5 h-3.5" /> Review Automation
               </Link>
             </motion.div>
           ))}

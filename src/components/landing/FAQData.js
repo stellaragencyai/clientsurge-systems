@@ -1,7 +1,7 @@
 export const FAQ_ITEMS = [
   {
     q: "Do I need to book a demo or sales call?",
-    a: "No. ClientSurge is built like a storefront — browse AI systems, add to cart, and check out. You complete a guided intake form at checkout that tells us everything we need to configure and install your system. No demos, no sales calls, no pressure.",
+    a: "No. ClientSurge is built around clear packages. Compare Starter, Growth, and Pro, then complete a guided intake form at checkout that tells us everything we need to configure and install your system. No demos, no sales calls, no pressure.",
     category: "setup",
   },
   {
@@ -41,12 +41,12 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How much does it cost?",
-    a: "Systems start at $497/month with a one-time setup fee. Starter, Growth, and Pro are based on how much of your lead flow you want ClientSurge to handle. Add to cart and check out — no hidden fees.",
+    a: "Starter begins at $99/month with a $249 one-time setup fee. Growth is $249/month with $499 setup, and Pro is $499/month with $999 setup. Package pricing is shown before checkout with no hidden fees.",
     category: "pricing",
   },
   {
     q: "Can I buy individual automations instead of a full system?",
-    a: "Yes. Visit the Automation Store to browse and add individual modules — lead capture, missed-call text-back, AI follow-up, booking, reviews, or reactivation — to your cart.",
+    a: "The safest launch path is to start with Starter, Growth, or Pro so onboarding, checkout, and provisioning stay consistent. If you need a custom module bundle, contact us and we will confirm the cleanest setup path.",
     category: "pricing",
   },
   {

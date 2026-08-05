@@ -18,7 +18,7 @@ const posts = [
     cta: { label: "Book an automation audit", href: "/book?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=missed_call_text_back_guide" },
     links: [
       { label: "Automation overview", href: "/automations" },
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
       { label: "Book an audit", href: "/book" },
     ],
     sections: [
@@ -63,9 +63,9 @@ const posts = [
     description:
       "A practical guide to AI lead follow-up automation for service businesses, including triggers, reply handling, booking prompts, and reporting.",
     keyword: "AI lead follow up automation",
-    cta: { label: "Compare ClientSurge packages", href: "/store?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=ai_lead_follow_up_automation" },
+    cta: { label: "Compare ClientSurge packages", href: "/pricing?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=ai_lead_follow_up_automation" },
     links: [
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
       { label: "See automations", href: "/automations" },
       { label: "Ask implementation questions", href: "/contact" },
     ],
@@ -115,7 +115,7 @@ const posts = [
     links: [
       { label: "Med spa system", href: "/med-spa" },
       { label: "Free Automation Audit", href: "/book" },
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
     ],
     sections: [
       {
@@ -162,7 +162,7 @@ const posts = [
     cta: { label: "Book a dental automation demo", href: "/book?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=dental_missed_call_automation" },
     links: [
       { label: "Dental system", href: "/dental" },
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
       { label: "Free Automation Audit", href: "/book" },
     ],
     sections: [
@@ -211,7 +211,7 @@ const posts = [
     links: [
       { label: "Contractor system", href: "/contractors" },
       { label: "Automation overview", href: "/automations" },
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
     ],
     sections: [
       {
@@ -259,7 +259,7 @@ const posts = [
     links: [
       { label: "HVAC system", href: "/hvac" },
       { label: "Book an audit", href: "/book" },
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
     ],
     sections: [
       {
@@ -351,9 +351,9 @@ const posts = [
     description:
       "A plain-English explanation of AI appointment booking for local businesses, including routing, qualification, calendars, and handoff limits.",
     keyword: "AI appointment booking local business",
-    cta: { label: "Start with Growth package", href: "/store?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=ai_appointment_booking_local_business" },
+    cta: { label: "Start with Growth package", href: "/pricing?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=ai_appointment_booking_local_business" },
     links: [
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
       { label: "See automations", href: "/automations" },
       { label: "Book an audit", href: "/book" },
     ],
@@ -402,7 +402,7 @@ const posts = [
     cta: { label: "Audit current response path", href: "/book?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=lead_response_speed_to_lead" },
     links: [
       { label: "Book an audit", href: "/book" },
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
       { label: "Contact ClientSurge", href: "/contact" },
     ],
     sections: [
@@ -447,9 +447,9 @@ const posts = [
     description:
       "A package-fit guide for choosing between ClientSurge Starter, Growth, and Pro based on lead volume, channels, follow-up needs, and launch readiness.",
     keyword: "AI automation package pricing",
-    cta: { label: "Compare packages", href: "/store?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=automation_package_comparison" },
+    cta: { label: "Compare packages", href: "/pricing?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=automation_package_comparison" },
     links: [
-      { label: "Compare packages", href: "/store" },
+      { label: "Compare packages", href: "/pricing" },
       { label: "Book an audit", href: "/book" },
       { label: "Ask a question", href: "/contact" },
     ],

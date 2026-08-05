@@ -1,3 +1,4 @@
+import { resendFetch } from "../resendFetch.js";
 /**
  * Canonical Stripe webhook handler shared by all Stripe webhook entry points.
  *
@@ -221,7 +222,7 @@ async function sendInvoiceEmailViaResend({ to, subject, html }) {
     return { sent: false, reason: "missing_config" };
   }
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from: fromEmail, to, subject, html }),

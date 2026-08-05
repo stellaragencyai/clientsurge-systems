@@ -1,5 +1,5 @@
 import StardustOverlay from "./StardustOverlay";
-import { ArrowRight, ShoppingCart, Shield, Zap, Phone, Clock, BadgeCheck } from "lucide-react";
+import { ArrowRight, Shield, Zap, Phone, Clock, BadgeCheck } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import CSButton from "@/components/design-system/CSButton";
 
@@ -13,17 +13,17 @@ export default function FinalCTA() {
           <div className="cs-section-title-row justify-center" style={{ gap: "10px" }}>
             <span className="cs-section-bar" aria-hidden="true" />
             <h2 className="cs-section-title">
-              Add to Cart. Check Out. We Handle the Rest.
+              Choose a Package. Check Out. We Handle the Rest.
             </h2>
           </div>
           <p className="cs-section-subtitle mx-auto">
-            Pick your system, complete guided intake at checkout, and ClientSurge handles setup, provider connections, testing, and launch. No demos or sales calls required.
+            Compare Starter, Growth, and Pro, complete guided intake at checkout, and ClientSurge handles setup, provider connections, testing, and launch. No demos or sales calls required.
           </p>
         </div>
 
         <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-center">
           {[
-            { step: "01", title: "Add to cart", body: "Pick Starter, Growth, Pro, or individual automation modules that match your biggest gap." },
+            { step: "01", title: "Choose a package", body: "Pick Starter, Growth, or Pro based on the lead-flow gaps you want ClientSurge to handle." },
             { step: "02", title: "Check out", body: "Complete guided intake at checkout — tell us your lead sources, tools, booking path, and launch goals." },
             { step: "03", title: "We install & test", body: "ClientSurge configures the workflows and checks proof before treating the system as live." },
           ].map((item) => (
@@ -56,22 +56,22 @@ export default function FinalCTA() {
 
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
           <CSButton
-            to="/store"
+            to="/pricing"
             variant="primary"
             size="lg"
-            icon={ShoppingCart}
-            onClick={() => trackCTA("browse_automation_store", "final_cta")}
-          >
-            Browse the Store
-          </CSButton>
-          <CSButton
-            to="/pricing"
-            variant="secondary"
-            size="md"
             iconRight={ArrowRight}
             onClick={() => trackCTA("compare_packages", "final_cta")}
           >
             Compare Packages
+          </CSButton>
+          <CSButton
+            to="/product-signup"
+            variant="secondary"
+            size="md"
+            icon={Zap}
+            onClick={() => trackCTA("start_checkout", "final_cta")}
+          >
+            Start Checkout
           </CSButton>
         </div>
 

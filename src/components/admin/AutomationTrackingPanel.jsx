@@ -47,7 +47,7 @@ export default function AutomationTrackingPanel() {
   const loadChecklists = async () => {
     setLoading(true);
     try {
-      const data = await base44.asServiceRole.entities.AutomationChecklist.list("-created_date", 200);
+      const data = await base44.admin.entities.AutomationChecklist.list("-created_date", 200);
       setChecklists(data || []);
     } catch (err) {
       console.error("AutomationTrackingPanel load error:", err);
@@ -59,7 +59,7 @@ export default function AutomationTrackingPanel() {
   const updateStatus = async (id, newStatus) => {
     setUpdating(id);
     try {
-      await base44.asServiceRole.entities.AutomationChecklist.update(id, {
+      await base44.admin.entities.AutomationChecklist.update(id, {
         status: newStatus,
         ...(newStatus === "active" ? { went_live_at: new Date().toISOString() } : {}),
       });

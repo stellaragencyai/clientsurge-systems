@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
 function json(data, status = 200) {
@@ -273,7 +274,7 @@ async function sendResendEmail(toEmail, subject, body) {
   const requestBody = JSON.stringify({ from: fromEmail, to: toEmail, subject, text: body });
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: requestBody,

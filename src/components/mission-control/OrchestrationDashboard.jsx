@@ -18,7 +18,7 @@ export default function OrchestrationDashboard() {
       setLoading(true);
       try {
         // Fetch active workflows
-        const active = await base44.asServiceRole.entities.OrchestrationWorkflow.filter(
+        const active = await base44.admin.entities.OrchestrationWorkflow.filter(
           { status: { $in: ['initiated', 'in_progress'] } },
           '-started_at',
           50
@@ -27,13 +27,13 @@ export default function OrchestrationDashboard() {
         setWorkflows(active || []);
 
         // Calculate metrics
-        const completed = await base44.asServiceRole.entities.OrchestrationWorkflow.filter(
+        const completed = await base44.admin.entities.OrchestrationWorkflow.filter(
           { status: 'completed' },
           '-completed_at',
           1000
         ).catch(() => []);
 
-        const duplicates = await base44.asServiceRole.entities.IdempotencyKey.filter(
+        const duplicates = await base44.admin.entities.IdempotencyKey.filter(
           { status: 'completed' },
           '-created_date',
           10000

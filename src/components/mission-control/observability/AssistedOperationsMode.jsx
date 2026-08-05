@@ -85,7 +85,7 @@ export default function AssistedOperationsMode() {
       const [obsRes, clientRes, leadsRes, pipelineRes] = await Promise.all([
         base44.functions.invoke('getSystemObservabilityMetrics', {}),
         base44.functions.invoke('getPlatformClientsOverview', {}),
-        base44.asServiceRole.entities.Leads.filter({}, '-intelligence_score', 100),
+        base44.admin.entities.Leads.filter({}, '-intelligence_score', 100),
         base44.functions.invoke('getLeadPipelineSummary', {}),
       ]);
 

@@ -13,29 +13,29 @@ export const CAMPAIGN_CONFIG = {
   offers: {
     starter: {
       name: "Starter",
-      standardSetupFee: 797,
-      standardMonthly: 497,
+      standardSetupFee: 249,
+      standardMonthly: 99,
       founderSetupFee: 0, // Waived
-      founderMonthly: 497,
-      savings: "$797 setup waived",
+      founderMonthly: 99,
+      savings: "$249 setup waived",
       icon: "🚀",
     },
     growth: {
       name: "Growth",
-      standardSetupFee: 1297,
-      standardMonthly: 997,
-      founderSetupFee: 1297,
-      founderMonthly: 499, // 50% off first 3 months
+      standardSetupFee: 499,
+      standardMonthly: 249,
+      founderSetupFee: 499,
+      founderMonthly: 125, // roughly 50% off first 3 months
       months: 3,
       savings: "50% off monthly for 3 months",
       icon: "⚡",
     },
     elite: {
       name: "Elite",
-      standardSetupFee: 2497,
-      standardMonthly: 1997,
-      founderSetupFee: 2497,
-      founderMonthly: 1997,
+      standardSetupFee: 999,
+      standardMonthly: 499,
+      founderSetupFee: 999,
+      founderMonthly: 499,
       freeMonth: true,
       prioritySupport: true,
       savings: "1 month free + lifetime priority support",

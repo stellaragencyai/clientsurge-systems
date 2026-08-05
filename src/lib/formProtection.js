@@ -9,7 +9,7 @@
  *   if (checkRateLimit("lead_capture")) { return "Too many submissions" }
  */
 
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
 const RATE_LIMIT_MAX_SUBMITS = 3; // 3 submissions per minute per IP
@@ -110,17 +110,15 @@ export function useFormProtection(actionKey = "lead_capture") {
  * Render inside any form to catch automated submissions.
  */
 export function HoneypotField({ value, onChange, fieldName = "website_url" }) {
-  return (
-    <input
-      type="text"
-      name={fieldName}
-      value={value || ""}
-      onChange={(e) => onChange?.(e.target.value)}
-      tabIndex={-1}
-      autoComplete="off"
-      className="hidden"
-      aria-hidden="true"
-      style={{ display: "none", position: "absolute", left: "-9999px" }}
-    />
-  );
+  return createElement("input", {
+    type: "text",
+    name: fieldName,
+    value: value || "",
+    onChange: (event) => onChange?.(event.target.value),
+    tabIndex: -1,
+    autoComplete: "off",
+    className: "hidden",
+    "aria-hidden": "true",
+    style: { display: "none", position: "absolute", left: "-9999px" },
+  });
 }

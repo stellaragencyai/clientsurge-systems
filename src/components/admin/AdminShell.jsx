@@ -117,7 +117,7 @@ export default function AdminShell({ children, title, activeId }) {
       try {
         const [msgs, failedEvents] = await Promise.all([
           base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
-          base44.asServiceRole.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
+          base44.admin.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
         ]);
         setInboxUnread((msgs || []).filter(m => m.role === "client").length);
         setWebhookErrorCount(countWebhookErrorEvents(failedEvents || []));

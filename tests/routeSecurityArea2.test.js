@@ -37,6 +37,7 @@ const PRIVATE_ROUTE_SAMPLES = {
     "/setup",
     "/setup/status/example-order",
     "/setup/preview/example-spec",
+    "/setup-lookup",
   ],
   internal: [
     "/pages",
@@ -74,7 +75,7 @@ test("Area 2 route classifier separates public, authenticated, admin, and intern
 });
 
 test("Area 2 auth and checkout utilities render in the app shell but remain noindex", () => {
-  for (const path of ["/login", "/register", "/forgot-password", "/reset-password", "/product-signup", "/signup", "/book", "/store", "/setup-lookup"]) {
+  for (const path of ["/login", "/register", "/forgot-password", "/reset-password", "/product-signup", "/signup", "/book", "/store"]) {
     assert.equal(classifyRoute(path), ROUTE_ACCESS.PUBLIC, `${path} is not an admin route`);
     assert.equal(isAppShellPublicRoute(path), true, `${path} should render without admin auth`);
     assert.equal(shouldNoindexRoute(path), true, `${path} should be noindex`);
@@ -113,6 +114,7 @@ test("Area 2 app-shell public list intentionally includes utility routes outside
   assert.equal(APP_SHELL_PUBLIC_PATHS.includes("/login"), true);
   assert.equal(APP_SHELL_PUBLIC_PATHS.includes("/product-signup"), true);
   assert.equal(APP_SHELL_PUBLIC_PATHS.includes("/client-portal"), true);
+  assert.equal(APP_SHELL_PUBLIC_PATHS.includes("/client-dashboard"), true);
   assert.equal(SITEMAP_STATIC_PATHS.includes("/login"), false);
   assert.equal(SITEMAP_STATIC_PATHS.includes("/product-signup"), false);
   assert.equal(SITEMAP_STATIC_PATHS.includes("/client-portal"), false);

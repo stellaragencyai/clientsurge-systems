@@ -8,6 +8,10 @@ import worker, {
   TELEGRAM_TRACKER_SCRIPT_ID,
   TRACKER_PATH,
 } from "../cloudflare/clientsurge-security-telegram-wrapper.mjs";
+import {
+  EDGE_HEALTH_HEADER,
+  EDGE_HEALTH_PATH,
+} from "../cloudflare/clientsurge-security-edge-worker.mjs";
 
 const env = {
   TELEGRAM_BOT_TOKEN: "test-token",
@@ -75,6 +79,16 @@ test("Cloudflare Telegram tracker serves same-origin sendBeacon script", async (
   assert.match(body, /data-track-click/);
   assert.match(body, /website_click/);
   assert.doesNotMatch(body, /workers\.dev/);
+});
+
+test("Cloudflare Telegram wrapper serves edge health before origin fallback", async () => {
+  const response = await worker.fetch(new Request(`https://clientsurgesystems.com${EDGE_HEALTH_PATH}`), env, {});
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get(EDGE_HEALTH_HEADER), "active");
+  assert.equal(body.ok, true);
+  assert.equal(body.entrypoint, "clientsurge-security-telegram-wrapper");
 });
 
 test("Cloudflare Telegram wrapper injects tracker into HTML after production-safe entry", async () => {

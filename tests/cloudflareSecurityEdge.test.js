@@ -803,6 +803,48 @@ test("Cloudflare route-bypass diagnostic identifies missing DNS/custom-hostname 
   assert.doesNotMatch(formatted, /test-token/);
 });
 
+test("Cloudflare route-bypass diagnostic exits cleanly when live Worker health is verified", async () => {
+  const report = await diagnoseRouteBypass({
+    configPath: new URL("./fixtures/wrangler-oauth.toml", import.meta.url),
+    fetchImpl: async (url) => {
+      const requestUrl = new URL(url);
+      const path = requestUrl.pathname;
+      if (requestUrl.hostname === "clientsurgesystems.com" && path === "/.well-known/clientsurge-edge-health.json") {
+        return Response.json(
+          { ok: true, edge: "clientsurge-security-edge" },
+          { headers: { "x-clientsurge-security-edge": "active" } }
+        );
+      }
+      if (path === "/client/v4/zones") {
+        return Response.json({ success: true, result: [{ id: "zone-123", name: "clientsurgesystems.com" }] });
+      }
+      if (path === "/client/v4/zones/zone-123/workers/routes") {
+        return Response.json({
+          success: true,
+          result: [
+            { id: "route-1", pattern: "clientsurgesystems.com/*", script: "clientsurge-security-edge" },
+            { id: "route-2", pattern: "www.clientsurgesystems.com/*", script: "clientsurge-security-edge" },
+          ],
+        });
+      }
+      return Response.json(
+        { success: false, errors: [{ code: 10000, message: "Authentication error" }] },
+        { status: 403 }
+      );
+    },
+  });
+
+  assert.equal(report.ok, true);
+  assert.equal(report.next_action.status, "live_worker_verified_management_limited");
+  assert.equal(report.probes.live_edge_health.ok, true);
+  assert.equal(report.probes.live_edge_health.worker_header, "active");
+  assert.deepEqual(report.next_action.denied_probes, ["dns-records", "custom-hostnames", "rulesets"]);
+
+  const formatted = formatRouteBypassDiagnosis(report);
+  assert.match(formatted, /Live edge probe:/);
+  assert.match(formatted, /x-clientsurge-security-edge=active \(ok\)/);
+});
+
 test("Cloudflare route-bypass diagnostic falls back across env and Wrangler token sources per endpoint", async () => {
   const previous = process.env.CLOUDFLARE_API_TOKEN;
   process.env.CLOUDFLARE_API_TOKEN = "env-token";

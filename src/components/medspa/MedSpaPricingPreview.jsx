@@ -31,7 +31,7 @@ export default function MedSpaPricingPreview() {
         <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg" style={{ background: "linear-gradient(135deg, #ffffff 0%, #fefdfb 100%)", boxShadow: "0 20px 60px -20px rgba(120,70,20,0.15), 0 0 1px rgba(120,70,20,0.2)", border: "2px solid transparent", backgroundImage: "linear-gradient(135deg, #ffffff 0%, #fefdfb 100%), linear-gradient(135deg, rgba(160,113,79,0.3) 0%, rgba(200,150,92,0.1) 100%)", backgroundOrigin: "border-box", backgroundClip: "padding-box, border-box" }}>
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo - One-time setup fee - Month-to-month after launch</p>
+              <p className="text-sm font-semibold text-foreground mb-4">Starting from $99/mo - One-time setup fee - Month-to-month after launch</p>
               <p className="text-sm font-semibold text-foreground mb-6">Every system includes:</p>
               <ul className="space-y-3">
                 {includes.map((item) => (

@@ -7,7 +7,7 @@ Generated for the pre-Stripe-proof launch push. This kit focuses on public websi
 Status: Repo-side campaign kit ready; external provider proof still required.
 
 Current frontend and catalog signals:
-- Public package prices are Starter at $797 setup and $497/month, Growth at $1,297 setup and $997/month, and Pro at $2,497 setup and $1,997/month.
+- Public package prices are Starter at $249 setup and $99/month, Growth at $499 setup and $249/month, and Pro at $999 setup and $499/month.
 - The public store still exposes smaller self-serve component prices for individual services, but canonical package checkout uses the package price IDs in `src/lib/salesCatalog.js`.
 - SEO/conversion audit is currently 9/10. The only failing check is a real GA4 measurement ID.
 - Resend send paths exist through the canonical CommunicationOutbox. Production still needs sender-domain proof and safe delivery/bounce evidence before large-volume email.
@@ -61,9 +61,9 @@ High-intent routes:
 - Industry pages: hero readability, CTA contrast, FAQ/schema, mobile layout.
 
 Catalog assertions:
-- Starter: 2 automations, $797 setup, $497/month.
-- Growth: 4 automations, $1,297 setup, $997/month.
-- Pro: 6 automations, $2,497 setup, $1,997/month.
+- Starter: 2 automations, $249 setup, $99/month.
+- Growth: 4 automations, $499 setup, $249/month.
+- Pro: 6 automations, $999 setup, $499/month.
 - Treat Elite only as a legacy alias for Pro when reading old records or staging override keys.
 - Avoid promising unsupported launch timing. Use "done-for-you setup" or "ready fast" unless a specific SLA has been operationally approved.
 

@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
 const THEME = {
@@ -73,7 +74,7 @@ Deno.serve(async (req) => {
     const logoUrl = Deno.env.get("CLIENTSURGE_LOGO_URL") || order.logo_url || "";
 
     if (resendApiKey && customerEmail) {
-      await fetch("https://api.resend.com/emails", {
+      await resendFetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({

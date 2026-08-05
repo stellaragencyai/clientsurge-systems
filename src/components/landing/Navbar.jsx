@@ -183,7 +183,7 @@ export default function Navbar() {
             onClick={() => {
               trackCTA("get_my_lead_system", "navbar");
               closeAll();
-              navigate("/store");
+              navigate("/pricing");
             }}
             className="transition-colors duration-200"
             style={{
@@ -198,7 +198,7 @@ export default function Navbar() {
               boxShadow: "0 6px 18px rgba(0,212,255,0.28)",
             }}
           >
-            Get My Lead System
+            Compare Packages
           </button>
         </div>
 
@@ -208,12 +208,12 @@ export default function Navbar() {
             onClick={() => {
               trackCTA("get_my_lead_system_mobile_bar", "navbar");
               closeAll();
-              navigate("/store");
+              navigate("/pricing");
             }}
             className="cs-btn-primary cs-nav-cta"
             style={{ minHeight: "44px", height: "44px", padding: "0 14px", fontSize: "0.7rem" }}
           >
-            Get My Lead System
+            Compare Packages
           </button>
           <button
             type="button"
@@ -355,12 +355,12 @@ export default function Navbar() {
                       onClick={() => {
                         trackCTA("get_my_lead_system", "mobile_nav");
                         closeAll();
-                        navigate("/store");
+                        navigate("/pricing");
                       }}
                       className="w-full rounded-xl border bg-white text-[14px] font-black text-slate-950 transition-colors hover:bg-sky-50"
                       style={{ minHeight: "48px", borderColor: "rgba(0,212,255,0.20)" }}
                     >
-                      Get My Lead System
+                      Compare Packages
                     </button>
                   </div>
                 </>
@@ -403,7 +403,7 @@ export default function Navbar() {
               onClick={() => {
                 trackCTA("get_my_lead_system", "mobile_nav_footer");
                 closeAll();
-                navigate("/store");
+                navigate("/pricing");
               }}
               className="mt-3 flex w-full items-center justify-center rounded-2xl text-[15px] font-black text-white transition-colors"
               style={{
@@ -412,7 +412,7 @@ export default function Navbar() {
                 boxShadow: "0 16px 34px rgba(0,212,255,0.28)",
               }}
             >
-              Get My Lead System
+              Compare Packages
             </button>
           </div>
         </>

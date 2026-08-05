@@ -30,7 +30,7 @@ export default function AdminOverlay() {
   useEffect(() => {
     const loadUnread = async () => {
       try {
-        const msgs = await base44.asServiceRole.entities.SupportMessage.filter({ read: false }, "-created_date", 50);
+        const msgs = await base44.admin.entities.SupportMessage.filter({ read: false }, "-created_date", 50);
         setInboxUnread((msgs || []).length);
       } catch {}
     };

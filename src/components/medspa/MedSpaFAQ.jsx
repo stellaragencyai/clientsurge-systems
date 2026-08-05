@@ -32,7 +32,7 @@ export const MEDSPA_FAQ_ITEMS = [
   },
   {
     q: "How much does it cost - and is it worth it?",
-    a: "Plans start at $497/month with a one-time setup fee. Whether it is worth it depends on your lead volume, treatment value, response gaps, and follow-through process. Book the demo and we'll walk through the math for your actual business instead of giving a generic ROI promise.",
+    a: "Plans start at $99/month with a $249 one-time setup fee. Whether it is worth it depends on your lead volume, treatment value, response gaps, and follow-through process. Book the demo and we'll walk through the math for your actual business instead of giving a generic ROI promise.",
   },
   {
     q: "What happens after I book a demo?",

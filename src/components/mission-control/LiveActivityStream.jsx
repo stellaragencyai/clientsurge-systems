@@ -17,7 +17,7 @@ export default function LiveActivityStream() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const result = await base44.asServiceRole.entities.CommunicationEvent.filter(
+        const result = await base44.admin.entities.CommunicationEvent.filter(
           {},
           '-created_date',
           20
@@ -32,7 +32,7 @@ export default function LiveActivityStream() {
     loadEvents();
 
     // Subscribe to real-time updates
-    const unsubscribe = base44.asServiceRole.entities.CommunicationEvent.subscribe((event) => {
+    const unsubscribe = base44.admin.entities.CommunicationEvent.subscribe((event) => {
       if (event.type === 'create') {
         setEvents((prev) => [event.data, ...prev.slice(0, 19)]);
       }

@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
 function secureJson(data = {}, init = {}) {
@@ -308,7 +309,7 @@ Deno.serve(async (req) => {
     }
     const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
 
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${resendKey}`,

@@ -82,7 +82,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
     if (matchingProduct) {
       sessionStorage.setItem("clientsurge:highlight-service", matchingProduct.product_id);
     }
-    window.location.href = "/store";
+    window.location.href = "/pricing";
   };
 
   if (!system) return null;

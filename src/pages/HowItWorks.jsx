@@ -125,7 +125,7 @@ export default function HowItWorks() {
         >
           <div className="mx-auto max-w-4xl text-left">
             <div className="cs-section-header cs-section-header--left mb-8">
-              <p className="cs-section-eyebrow">Business AI Automation Store</p>
+              <p className="cs-section-eyebrow">Business AI Automation Packages</p>
               <div className="cs-section-title-row">
                 <span className="cs-section-bar" />
                 <h1 className="cs-section-title cs-section-title--hero">
@@ -147,10 +147,10 @@ export default function HowItWorks() {
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/store"
+                to="/pricing"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
               >
-                Browse AI Automation Systems
+                Compare AI Automation Systems
               </Link>
             </div>
           </div>
@@ -315,7 +315,7 @@ export default function HowItWorks() {
                   <tr style={{ background: "#f7fbff" }}>
                     <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground w-1/4">Category</th>
                     <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground w-[37.5%]">Normal AI Agency</th>
-                    <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider w-[37.5%]" style={{ color: "#003B8F" }}>ClientSurge AI Automation Store</th>
+                    <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider w-[37.5%]" style={{ color: "#003B8F" }}>ClientSurge AI Automation Packages</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -346,7 +346,7 @@ export default function HowItWorks() {
         >
           <div className="mx-auto max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-200/80 mb-4">
-              Business AI Automation Store
+              Business AI Automation Packages
             </p>
             <h2 className="font-titles text-2xl font-bold text-white md:text-3xl mb-4">
               Ready to Start With a System Instead of a Guess?
@@ -363,10 +363,10 @@ export default function HowItWorks() {
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/store"
+                to="/pricing"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white hover:bg-white/20 transition-all"
               >
-                Browse Automation Store
+                Compare Packages
               </Link>
               <Link
                 to="/book"

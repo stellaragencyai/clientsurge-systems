@@ -9,7 +9,7 @@ export default function FunnelAnalyticsModule() {
   useEffect(() => {
     const loadFunnels = async () => {
       try {
-        const result = await base44.asServiceRole.entities.ConversionFunnel.filter(
+        const result = await base44.admin.entities.ConversionFunnel.filter(
           {},
           '-created_date',
           10

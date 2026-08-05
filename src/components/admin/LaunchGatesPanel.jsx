@@ -158,7 +158,7 @@ export default function LaunchGatesPanel({ initialSnapshot = null } = {}) {
     setLoading(true);
     setError("");
     try {
-      const entities = base44.asServiceRole?.entities || base44.entities;
+      const entities = base44.admin?.entities || base44.entities;
       const records = entities?.LaunchApproval?.list
         ? await entities.LaunchApproval.list("-requested_at", 200)
         : [];

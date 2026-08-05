@@ -16,8 +16,8 @@ export default function SalesAcquisitionModule() {
     const loadData = async () => {
       try {
         const [leads, funnelData] = await Promise.all([
-          base44.asServiceRole.entities.Leads.filter({}, 'id', 1),
-          base44.asServiceRole.entities.ConversionFunnel.filter({}, '-created_date', 5),
+          base44.admin.entities.Leads.filter({}, 'id', 1),
+          base44.admin.entities.ConversionFunnel.filter({}, '-created_date', 5),
         ]);
 
         setFunnels(funnelData || []);

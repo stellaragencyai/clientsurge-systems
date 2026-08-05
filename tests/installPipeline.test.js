@@ -8,6 +8,7 @@ import {
   derivePipelineStatus,
   initializePaidOrderInstallPipeline,
   listInstallQueueOrders,
+  mapPipelineStatusToOrderStatus,
   normalizeInstallConfiguration,
   syncInstallMirrorsFromOrder,
   updateOrderInstallConfiguration,
@@ -446,6 +447,38 @@ test("pipeline_status rollups are deterministic across mixed service states", ()
     derivePipelineStatus(buildTrackedOrder(["Live", "Live"])),
     "Live"
   );
+});
+
+test("pipeline_status fails closed when payment is pending, failed, null, or missing", () => {
+  const unsafePaymentStatuses = ["pending", "failed", null, undefined];
+  const trackedLiveItems = [
+    {
+      product_id: "prod_UNi5RHiKNSTfQl",
+      product_name: "Instant Lead Response",
+      service_key: "instant_lead_response",
+      tracking_enabled: true,
+      install_status: "Live",
+      status: "live",
+    },
+  ];
+
+  for (const payment_status of unsafePaymentStatuses) {
+    const order = {
+      payment_status,
+      install_initialized_at: "2026-04-22T12:05:00.000Z",
+      items: trackedLiveItems,
+    };
+
+    assert.equal(derivePipelineStatus(order), "Pending Payment");
+    assert.equal(
+      mapPipelineStatusToOrderStatus({
+        pipelineStatus: "Live",
+        trackedItems: trackedLiveItems,
+        paymentStatus: payment_status,
+      }),
+      "pending_payment"
+    );
+  }
 });
 
 test("duplicate paid-order initialization is idempotent for records and audit events", async () => {

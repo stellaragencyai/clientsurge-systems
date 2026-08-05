@@ -115,7 +115,7 @@ export default function OnboardingPipeline() {
 
   const load = async () => {
     try {
-      const data = await base44.asServiceRole.entities.ClientInstallationOS.list("-updated_date", 100);
+      const data = await base44.admin.entities.ClientInstallationOS.list("-updated_date", 100);
       setClients(data || []);
     } catch (e) {
       console.error(e);

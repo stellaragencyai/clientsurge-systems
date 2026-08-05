@@ -37,14 +37,14 @@ export default function WebsiteLeadsDashboard() {
       const safePage = normalizeWebsiteLeadPage(nextPage);
       let data;
       try {
-        data = await base44.asServiceRole.entities.WebsiteLead.filter(
+        data = await base44.admin.entities.WebsiteLead.filter(
           buildWebsiteLeadQuery(filter, { includeHidden }),
           sort,
           getWebsiteLeadFetchLimit(safePage, undefined, includeHidden ? 1 : 4)
         );
       } catch (error) {
         // Some Base44 SDK contexts may not support $ne; retry raw and filter client-side.
-        data = await base44.asServiceRole.entities.WebsiteLead.filter(
+        data = await base44.admin.entities.WebsiteLead.filter(
           buildWebsiteLeadQuery(filter, { includeHidden: true }),
           sort,
           getWebsiteLeadFetchLimit(safePage, undefined, includeHidden ? 1 : 4)
@@ -67,7 +67,7 @@ export default function WebsiteLeadsDashboard() {
 
   const loadLogs = async (leadId) => {
     try {
-      const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+      const events = await base44.admin.entities.CommunicationEvent.filter(
         { context_id: leadId, context_type: 'website_lead' },
         '-created_date',
         50
@@ -86,7 +86,7 @@ export default function WebsiteLeadsDashboard() {
 
   const updateLeadStatus = async (leadId, field, value) => {
     try {
-      await base44.asServiceRole.entities.WebsiteLead.update(leadId, {
+      await base44.admin.entities.WebsiteLead.update(leadId, {
         [field]: value,
       });
       loadLeads(page);
@@ -118,7 +118,7 @@ export default function WebsiteLeadsDashboard() {
     if (!lead?.id) return;
     setCleanupLoading(true);
     try {
-      await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+      await base44.admin.entities.WebsiteLead.update(lead.id, {
         archived: true,
         archived_at: new Date().toISOString(),
         lead_status: 'ignored',
@@ -150,7 +150,7 @@ export default function WebsiteLeadsDashboard() {
 
     setCleanupLoading(true);
     try {
-      await base44.asServiceRole.entities.WebsiteLead.delete(lead.id);
+      await base44.admin.entities.WebsiteLead.delete(lead.id);
       setCleanupMessage('Deleted verified junk WebsiteLead.');
       setSelectedLead(null);
       setLogs([]);

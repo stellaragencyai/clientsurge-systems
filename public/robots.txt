@@ -1,45 +1,70 @@
-# ClientSurge Systems — robots.txt
-# Fixes Audit Issue #66: No robots.txt optimization
-
-# Sitemap
-Sitemap: https://clientsurgesystems.com/sitemap.xml
-
-# Block admin and internal routes
 User-agent: *
+Allow: /
+
+Disallow: /prelaunch-preview
+Disallow: /_generated
+Disallow: /_generated/
+Disallow: /pages
+Disallow: /pages/
 Disallow: /admin
 Disallow: /admin/
-Disallow: /client-portal
-Disallow: /client-portal/
-Disallow: /setup
-Disallow: /setup/
-Disallow: /onboarding
-Disallow: /onboarding/
+Disallow: /admin-settings
+Disallow: /admin/settings
+Disallow: /adminsettings
 Disallow: /dashboard
 Disallow: /dashboard/
+Disallow: /client
+Disallow: /client/
+Disallow: /client-portal
+Disallow: /client-portal/
+Disallow: /client-dashboard
+Disallow: /client-dashboard/
+Disallow: /client-saas
+Disallow: /client-saas/
+Disallow: /dashboard-entry
+Disallow: /dashboard-entry/
+Disallow: /setup
+Disallow: /setup/
+Disallow: /setup/credentials
+Disallow: /setup/preview
+Disallow: /setup/status
+Disallow: /functions
+Disallow: /functions/
+Disallow: /function
+Disallow: /function/
+Disallow: /internal
+Disallow: /internal/
+Disallow: /private
+Disallow: /private/
+Disallow: /onboarding
+Disallow: /onboarding/
+Disallow: /install
+Disallow: /install/
+Disallow: /audit
+Disallow: /audit/
+Disallow: /observability
+Disallow: /observability/
+Disallow: /reconciliation
+Disallow: /reconciliation/
+Disallow: /review
+Disallow: /review/
 Disallow: /api/
-Disallow: /_generated/
-Disallow: /pages/
-Disallow: /success
-Disallow: /order-success
-Disallow: /thank-you
-Disallow: /launch-control
+Disallow: /base44/
+Disallow: /saas
+Disallow: /saas/
+Disallow: /settings
+Disallow: /settings/
+Disallow: /mission-control
+Disallow: /lead-intelligence
+Disallow: /leadintelligence
+Disallow: /sam
+Disallow: /medspa-dashboard
+Disallow: /medspadashboard
+Disallow: /setup-lookup
+Disallow: /account-deletion
+Disallow: /delete-account
+Disallow: /data-deletion
+Disallow: /product-signup
+Disallow: /store
 
-# Block AI training crawlers (optional)
-User-agent: GPTBot
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: anthropic-ai
-Disallow: /
-
-# Allow all crawlers to access public pages
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-# Crawl rate
-Crawl-delay: 1
+Sitemap: https://clientsurgesystems.com/sitemap.xml

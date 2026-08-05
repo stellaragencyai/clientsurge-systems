@@ -125,8 +125,8 @@ Every industry page follows this exact flow:
 - Clear feature lists per tier
 
 **Tier Mapping Example (HVAC)**:
-- **Starter** ($497/mo): AI Response + Missed Call Recovery
-- **Growth** ($997/mo): Above + Email + Booking Link + Lead Scoring
+- **Starter** ($99/mo): AI Response + Missed Call Recovery
+- **Growth** ($249/mo): Above + Email + Booking Link + Lead Scoring
 - **Pro** (Custom): Above + Voice AI + Advanced Routing
 
 **Conversion Goals**: Show value at each tier, make upgrade path clear, enable self-selection

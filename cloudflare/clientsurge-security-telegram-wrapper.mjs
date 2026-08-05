@@ -1,4 +1,8 @@
 import productionSafeEntry from "./clientsurge-production-safe-entry.mjs";
+import {
+  EDGE_HEALTH_HEADER,
+  EDGE_HEALTH_PATH,
+} from "./clientsurge-security-edge-worker.mjs";
 
 export const SITE_ORIGIN = "https://clientsurgesystems.com";
 export const WWW_ORIGIN = "https://www.clientsurgesystems.com";
@@ -87,6 +91,21 @@ function jsonResponse(request, env, body, status = 200, extraHeaders = {}) {
   return Response.json(body, {
     status,
     headers: corsHeaders(request, env, extraHeaders),
+  });
+}
+
+function edgeHealthResponse() {
+  return Response.json({
+    ok: true,
+    edge: "clientsurge-security-edge",
+    entrypoint: "clientsurge-security-telegram-wrapper",
+    canonical: SITE_ORIGIN,
+  }, {
+    status: 200,
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+      [EDGE_HEALTH_HEADER]: "active",
+    },
   });
 }
 
@@ -475,6 +494,13 @@ function injectTelegramTracker(html = "") {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname === EDGE_HEALTH_PATH && (request.method === "GET" || request.method === "HEAD")) {
+      return request.method === "HEAD" ? new Response(null, {
+        status: 200,
+        headers: edgeHealthResponse().headers,
+      }) : edgeHealthResponse();
+    }
 
     if (url.pathname === TRACKER_PATH && (request.method === "GET" || request.method === "HEAD")) {
       return request.method === "HEAD"
