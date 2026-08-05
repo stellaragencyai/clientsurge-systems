@@ -604,6 +604,35 @@ export default function ThreeSystemsSection() {
         </div>
 
         <div
+          className="mx-auto mb-8 max-w-3xl rounded-2xl px-6 py-5 text-center"
+          style={{
+            background: "linear-gradient(135deg, rgba(0,71,171,0.06) 0%, rgba(0,212,255,0.04) 100%)",
+            border: "1.5px solid rgba(0,212,255,0.28)",
+            boxShadow: "0 4px 24px rgba(0,212,255,0.08)",
+          }}
+        >
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <ShieldCheck className="w-5 h-5 text-primary" aria-hidden="true" />
+            <span className="text-sm font-black uppercase tracking-[0.1em] text-primary">
+              Professional AI Implementation Included
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed mb-4">
+            Every package includes a mandatory done-for-you implementation fee. Our team installs, configures,
+            tests, and verifies your entire automation system before launch — no DIY, no hidden costs.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            {PACKAGES.map((pkg) => (
+              <span key={pkg.packageId} className="inline-flex items-baseline gap-1.5 text-xs font-bold">
+                <span className="text-foreground/60">{pkg.name}:</span>
+                <span className="text-primary">{pkg.setupPrice}</span>
+                <span className="text-muted-foreground font-medium">setup</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div
           className={`csp-coverage-shell ${motionReady ? "is-motion-ready" : ""} ${hasEntered ? "is-visible" : ""}`}
           aria-label={`${activePackage.title} system coverage`}
         >

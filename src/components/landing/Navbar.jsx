@@ -139,7 +139,7 @@ export default function Navbar() {
           />
         </a>
 
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 flex-1 justify-center">
           {DESKTOP_NAV.map((link) => (
             <a
               key={link.href}

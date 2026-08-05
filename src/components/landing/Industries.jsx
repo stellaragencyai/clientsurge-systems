@@ -12,6 +12,7 @@ import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 import medSpaIndustryImage from "@/assets/industry-medspa.webp";
 import roofingIndustryImage from "@/assets/industry-roofing.webp";
+import MedSpaResultsCarousel from "./MedSpaResultsCarousel.jsx";
 
 const industryPatterns = {
   "med-spa": (
@@ -498,6 +499,8 @@ export default function Industries() {
           );
         })}
       </div>
+
+      <MedSpaResultsCarousel />
     </section>
   );
 }
