@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   ShieldCheck,
   Sparkles,
+  Wrench,
   Zap,
   Globe,
   Server,
@@ -375,12 +376,59 @@ export default function ThreeSystemsSection() {
           font-weight: 500;
           letter-spacing: -0.015em;
         }
-        .csp-setup {
-          margin-top: 9px;
+        .csp-impl-fee {
+          margin-top: 14px;
+          padding: 12px 14px;
+          border-radius: 0.625rem;
+          background: linear-gradient(135deg, rgba(0,71,171,0.06), rgba(0,212,255,0.04));
+          border: 1.5px solid rgba(0,212,255,0.22);
+        }
+        .csp-impl-fee-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .csp-impl-icon {
+          width: 14px;
+          height: 14px;
           color: hsl(var(--primary));
-          font-size: 0.78rem;
-          font-weight: 700;
-          line-height: 1.3;
+          flex-shrink: 0;
+        }
+        .csp-impl-label {
+          flex: 1;
+          font-size: 0.7rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: hsl(var(--foreground));
+        }
+        .csp-impl-required {
+          padding: 2px 8px;
+          border-radius: 999px;
+          font-size: 0.6rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          background: rgba(220,38,38,0.10);
+          border: 1px solid rgba(220,38,38,0.25);
+          color: #dc2626;
+        }
+        .csp-impl-price-row {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          margin-top: 8px;
+        }
+        .csp-impl-price {
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: hsl(var(--primary));
+          letter-spacing: -0.02em;
+        }
+        .csp-impl-price-note {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: hsl(var(--muted-foreground));
         }
         .csp-contract {
           margin-top: 12px;
@@ -729,7 +777,17 @@ export default function ThreeSystemsSection() {
                           <span className="csp-price">{pkg.price}</span>
                           <span className="csp-period">/mo USD</span>
                         </div>
-                        <p className="csp-setup">{pkg.setupPrice} one-time setup</p>
+                        <div className="csp-impl-fee" role="note">
+                          <div className="csp-impl-fee-header">
+                            <Wrench className="csp-impl-icon" aria-hidden="true" />
+                            <span className="csp-impl-label">Professional AI Implementation</span>
+                            <span className="csp-impl-required">Required</span>
+                          </div>
+                          <div className="csp-impl-price-row">
+                            <span className="csp-impl-price">{pkg.setupPrice}</span>
+                            <span className="csp-impl-price-note">one-time fee</span>
+                          </div>
+                        </div>
                         <p className="csp-contract">No long-term contracts. Cancel anytime.</p>
                         <span className="csp-best-for">Best for: {pkg.bestFor}</span>
                       </div>

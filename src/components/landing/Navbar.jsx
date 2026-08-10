@@ -185,17 +185,17 @@ export default function Navbar() {
               closeAll();
               navigate("/store");
             }}
-            className="transition-colors duration-200"
+            className="cs-nav-cta transition-all duration-200 hover:-translate-y-0.5"
             style={{
-              minHeight: "unset",
-              minWidth: "unset",
-              padding: "0.55rem 1.1rem",
+              minHeight: "44px",
+              padding: "0 1.25rem",
               fontSize: "0.8125rem",
-              fontWeight: 700,
+              fontWeight: 800,
               color: "#ffffff",
               background: "linear-gradient(90deg, #0047AB 0%, #00D4FF 100%)",
               borderRadius: "0.625rem",
-              boxShadow: "0 6px 18px rgba(0,212,255,0.28)",
+              boxShadow: "0 4px 16px rgba(0,212,255,0.35), 0 0 0 1px rgba(0,212,255,0.15)",
+              whiteSpace: "nowrap",
             }}
           >
             Get My Lead System

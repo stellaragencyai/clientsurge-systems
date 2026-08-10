@@ -1,15 +1,19 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { Wrench, CalendarDays, Plug, ShieldCheck } from 'lucide-react';
+import { Lock, ShieldCheck, FileCheck, Database } from 'lucide-react';
 
-/**
- * TrustStrip — compact horizontal trust band placed directly below the hero.
- * Four truthful ClientSurge points. Desktop = one row; mobile = clean 2x2.
- */
-const POINTS = [
-  { icon: Wrench, label: 'Done-for-you setup' },
-  { icon: CalendarDays, label: 'Month-to-month' },
-  { icon: Plug, label: 'Works with existing systems' },
-  { icon: ShieldCheck, label: 'Tested before launch' },
+const INTEGRATIONS = [
+  'Stripe',
+  'Twilio',
+  'Resend',
+  'OpenAI',
+  'Google Analytics',
+];
+
+const SECURITY = [
+  { icon: Lock, label: 'SSL Encrypted' },
+  { icon: ShieldCheck, label: 'TCPA Compliant' },
+  { icon: FileCheck, label: 'GDPR Ready' },
+  { icon: Database, label: 'SOC 2 Aligned' },
 ];
 
 export default function TrustStrip() {
@@ -17,39 +21,51 @@ export default function TrustStrip() {
   const item = reduce
     ? {}
     : {
-        hidden: { opacity: 0, y: 10 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
-        },
+        hidden: { opacity: 0, y: 8 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
       };
 
   return (
     <section
-      aria-label="Why ClientSurge"
+      aria-label="Integrations and security standards"
       className="relative mx-auto w-full max-w-[1200px] px-4 sm:px-6"
       style={{ marginTop: 'clamp(28px, 4vw, 44px)' }}
     >
       <motion.div
-        variants={reduce ? {} : { hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}
+        variants={reduce ? {} : { hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
         initial={reduce ? false : 'hidden'}
         whileInView={reduce ? undefined : 'show'}
         viewport={{ once: true, amount: 0.4 }}
-        className="grid grid-cols-2 gap-3 rounded-2xl border border-[hsl(199,55%,90%)] bg-white px-5 py-4 shadow-[0_1px_3px_rgba(0,71,171,0.05)] sm:grid-cols-4 sm:gap-4 sm:px-6"
+        className="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:flex-row sm:justify-between"
       >
-        {POINTS.map(({ icon: Icon, label }) => (
-          <motion.div
-            key={label}
-            variants={item}
-            className="flex items-center gap-2.5 justify-center sm:justify-start"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgba(0,71,171,0.06)] text-[#0047AB]">
-              <Icon className="h-4 w-4" strokeWidth={2} />
+        <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <span className="mr-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            Integrations
+          </span>
+          {INTEGRATIONS.map((name) => (
+            <span
+              key={name}
+              className="text-sm font-bold text-slate-500 transition-all duration-300 hover:text-slate-700"
+              style={{ letterSpacing: '-0.01em' }}
+            >
+              {name}
             </span>
-            <span className="text-[13px] font-semibold leading-tight text-slate-700">{label}</span>
-          </motion.div>
-        ))}
+          ))}
+        </motion.div>
+
+        <div className="hidden h-8 w-px bg-slate-200 sm:block" />
+
+        <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          {SECURITY.map(({ icon: Icon, label }) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-500"
+            >
+              <Icon className="h-3.5 w-3.5 text-slate-400" strokeWidth={2} />
+              {label}
+            </span>
+          ))}
+        </motion.div>
       </motion.div>
     </section>
   );
