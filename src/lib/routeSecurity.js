@@ -37,6 +37,14 @@ function normalize(pathname = "/") {
   return value || "/";
 }
 
+function isNonProductionHost() {
+  if (typeof window === "undefined") return false;
+  const host = String(window.location?.hostname || "").toLowerCase();
+  if (!host) return false;
+  if (host === "clientsurgesystems.com" || host === "www.clientsurgesystems.com") return false;
+  return host === "beta.clientsurgesystems.com" || host.endsWith(".base44.app") || host.includes("preview-sandbox");
+}
+
 export function matchesRoutePrefix(pathname, route) {
   const normalizedPathname = normalize(pathname);
   const normalizedRoute = normalize(route);
@@ -71,6 +79,7 @@ export function isAppShellPublicRoute(pathname = "/") {
 }
 
 export function shouldNoindexRoute(pathname = "/") {
+  if (isNonProductionHost()) return true;
   return NOINDEX_PREFIXES.some((prefix) => matchesRoutePrefix(pathname, prefix));
 }
 
