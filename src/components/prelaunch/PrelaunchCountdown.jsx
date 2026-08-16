@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 
-// September 1, 2027 at 12:00 a.m. America/Phoenix time (MST = UTC-7, no DST)
-const LAUNCH_TARGET = new Date("2027-09-01T07:00:00.000Z");
+// September 1, 2026 at 12:00 a.m. America/Phoenix time (MST = UTC-7, no DST)
+const LAUNCH_TARGET = new Date("2026-09-01T07:00:00.000Z");
 
 function getRemaining() {
   const diff = LAUNCH_TARGET.getTime() - Date.now();
@@ -37,9 +37,13 @@ export default function PrelaunchCountdown() {
   return (
     <section className="prelaunch-countdown" aria-labelledby="prelaunch-countdown-heading">
       <div className="prelaunch-countdown__inner">
+        <span className="prelaunch-countdown__kicker">Launching September 1, 2026</span>
         <h2 id="prelaunch-countdown-heading" className="prelaunch-countdown__heading">
-          Launching in
+          Stop losing leads because nobody responded fast enough.
         </h2>
+        <p className="prelaunch-countdown__intro">
+          ClientSurge launches a connected AI lead-response system built to handle the critical steps between an incoming inquiry and a booked appointment.
+        </p>
         <div className="prelaunch-countdown__grid" role="timer">
           {units.map((unit) => (
             <div key={unit.label} className="prelaunch-countdown__unit">
@@ -54,7 +58,29 @@ export default function PrelaunchCountdown() {
           ))}
         </div>
         <p className="prelaunch-countdown__date">
-          September 1, 2027 at 12:00 a.m. Arizona time
+          September 1, 2026 at 12:00 a.m. Arizona time
+        </p>
+
+        <div className="prelaunch-countdown__outcomes" aria-label="What ClientSurge automates">
+          <div>
+            <strong>Responds in seconds</strong>
+            <span>New website inquiries can get an immediate response.</span>
+          </div>
+          <div>
+            <strong>Recovers missed calls</strong>
+            <span>Missed callers can receive an automatic text-back.</span>
+          </div>
+          <div>
+            <strong>Follows up automatically</strong>
+            <span>Leads keep moving until there is a clear next step.</span>
+          </div>
+        </div>
+
+        <a href="#waitlist" className="prelaunch-countdown__cta">
+          Join the Founding Waitlist
+        </a>
+        <p className="prelaunch-countdown__microcopy">
+          Founding access is limited to the first 1,000 eligible businesses.
         </p>
       </div>
     </section>
