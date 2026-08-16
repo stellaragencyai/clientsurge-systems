@@ -331,14 +331,49 @@
   grid-template-columns: 22px 34px 1fr;
   align-items: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 8px 12px;
+  min-height: 58px;
+  padding: 9px 12px;
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 12px;
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.88);
   font-size: 0.82rem;
   font-weight: 700;
+}
+
+.prelaunch-hero__flow-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.3;
+}
+
+.prelaunch-hero__flow-copy strong {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.prelaunch-hero__flow-copy small {
+  color: rgba(255,255,255,0.55);
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.prelaunch-hero__missed-call {
+  margin: 16px 0 0 !important;
+  padding: 12px 14px;
+  border-left: 3px solid #00AEEF;
+  border-radius: 0 10px 10px 0;
+  background: rgba(0,174,239,0.08);
+  color: rgba(255,255,255,0.72) !important;
+  font-size: 0.76rem !important;
+  line-height: 1.5 !important;
+}
+
+.prelaunch-hero__missed-call strong {
+  color: #ffffff;
 }
 
 .prelaunch-hero__flow-index {
@@ -399,17 +434,44 @@
 }
 
 .prelaunch-countdown__inner {
-  width: min(100%, 720px);
+  width: min(100%, 920px);
   margin: 0 auto;
   text-align: center;
 }
 
+.prelaunch-countdown__kicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  padding: 6px 12px;
+  border: 1px solid rgba(0,174,239,0.18);
+  border-radius: 999px;
+  background: rgba(0,174,239,0.08);
+  color: var(--pl-blue-deep);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
 .prelaunch-countdown__heading {
-  margin: 0 0 32px;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  max-width: 760px;
+  margin: 0 auto;
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
   color: var(--pl-navy-950);
+  text-wrap: balance;
+}
+
+.prelaunch-countdown__intro {
+  max-width: 700px;
+  margin: 16px auto 30px;
+  color: var(--pl-slate);
+  font-size: 0.98rem;
+  line-height: 1.7;
 }
 
 .prelaunch-countdown__grid {
@@ -453,10 +515,71 @@
 }
 
 .prelaunch-countdown__date {
-  margin: 28px 0 0;
+  margin: 22px 0 0;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--pl-slate);
+}
+
+.prelaunch-countdown__outcomes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.prelaunch-countdown__outcomes > div {
+  min-height: 118px;
+  padding: 18px;
+  border: 1px solid var(--pl-border);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.88);
+  box-shadow: var(--pl-shadow-sm);
+}
+
+.prelaunch-countdown__outcomes strong {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--pl-navy-950);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.prelaunch-countdown__outcomes span {
+  display: block;
+  color: var(--pl-slate);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.prelaunch-countdown__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  margin-top: 28px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--pl-blue-deep), var(--pl-navy-800));
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(0, 136, 204, 0.26);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prelaunch-countdown__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 136, 204, 0.34);
+}
+
+.prelaunch-countdown__microcopy {
+  margin: 10px 0 0;
+  color: var(--pl-slate-light);
+  font-size: 0.76rem;
+  line-height: 1.5;
 }
 
 /* ── System overview ── */
@@ -945,6 +1068,13 @@
   .prelaunch-countdown__grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+  }
+  .prelaunch-countdown__outcomes {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .prelaunch-countdown__outcomes > div {
+    min-height: 0;
   }
   .prelaunch-footer__inner {
     flex-direction: column;
