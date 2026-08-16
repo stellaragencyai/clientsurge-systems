@@ -10,10 +10,11 @@ import {
 } from "lucide-react";
 
 const FLOW_STEPS = [
-  { label: "New inquiry captured", Icon: Globe2 },
-  { label: "Instant AI response", Icon: MessageSquareText },
-  { label: "Follow-up continues", Icon: Workflow },
-  { label: "Appointment booked", Icon: CalendarCheck2 },
+  { label: "Lead comes in", detail: "Website form, call, or inquiry", Icon: Globe2 },
+  { label: "Instant AI response", detail: "Responds in seconds", Icon: MessageSquareText },
+  { label: "Automatic follow-up", detail: "No lead gets forgotten", Icon: Workflow },
+  { label: "Lead is qualified", detail: "Moves the right opportunities forward", Icon: ShieldCheck },
+  { label: "Appointment booked", detail: "A clear next step is created", Icon: CalendarCheck2 },
 ];
 
 const SYSTEM_LAYERS = [
@@ -33,18 +34,17 @@ export default function PrelaunchHero() {
       <div className="prelaunch-hero__bg" aria-hidden="true" />
       <div className="prelaunch-hero__inner">
         <div className="prelaunch-hero__content">
-          <span className="prelaunch-hero__eyebrow">ClientSurge Systems · Founding Access</span>
+          <span className="prelaunch-hero__eyebrow">AI Lead Response &amp; Booking Automation for Local Businesses</span>
           <h1 id="prelaunch-hero-headline" className="prelaunch-hero__headline">
-            More Time. More Customers. Less Manual Work.
+            Turn incoming leads into booked appointments—automatically.
           </h1>
           <p className="prelaunch-hero__copy">
-            ClientSurge combines a visually premium, high-converting industry website with built-in
-            AI automations, managed infrastructure, and industry-specific AI capabilities—helping
-            your business capture, follow up with, and convert more opportunities around the clock.
+            ClientSurge installs one connected AI-powered system that responds to website leads,
+            texts missed callers, follows up automatically, qualifies prospects, and moves them
+            toward a booked appointment—24/7.
           </p>
           <p className="prelaunch-hero__outcome">
-            A smarter customer-acquisition system designed to give business owners more freedom and
-            more room to grow.
+            Website leads · Missed calls · Follow-up · Qualification · Booking
           </p>
           <button type="button" onClick={scrollToForm} className="prelaunch-hero__cta">
             Join the Founding Waitlist <ArrowRight size={18} aria-hidden="true" />
@@ -73,23 +73,30 @@ export default function PrelaunchHero() {
             </div>
 
             <div className="prelaunch-hero__system-body">
-              <span className="prelaunch-hero__system-eyebrow">Website + AI automation</span>
-              <h2>Capture the opportunity. Automate what happens next.</h2>
+              <span className="prelaunch-hero__system-eyebrow">How ClientSurge works</span>
+              <h2>From incoming lead to booked appointment.</h2>
               <p>
-                One connected system moves a new lead from first contact toward a booked customer.
+                One connected system handles the critical steps that usually depend on somebody responding manually.
               </p>
 
               <div className="prelaunch-hero__flow" aria-hidden="true">
-                {FLOW_STEPS.map(({ label, Icon }, index) => (
+                {FLOW_STEPS.map(({ label, detail, Icon }, index) => (
                   <div className="prelaunch-hero__flow-step" key={label}>
                     <span className="prelaunch-hero__flow-index">{index + 1}</span>
                     <span className="prelaunch-hero__flow-icon">
                       <Icon size={17} />
                     </span>
-                    <span>{label}</span>
+                    <span className="prelaunch-hero__flow-copy">
+                      <strong>{label}</strong>
+                      <small>{detail}</small>
+                    </span>
                   </div>
                 ))}
               </div>
+
+              <p className="prelaunch-hero__missed-call">
+                <strong>Missed call?</strong> ClientSurge can text the caller back automatically and start the conversation.
+              </p>
 
               <div className="prelaunch-hero__layers">
                 {SYSTEM_LAYERS.map(({ label, Icon }) => (
