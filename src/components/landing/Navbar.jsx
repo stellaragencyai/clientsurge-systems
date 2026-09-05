@@ -160,7 +160,7 @@ export default function Navbar() {
             onClick={() => {
               trackCTA("client_login", "navbar");
               closeAll();
-              navigate("/login");
+              navigate("/client-portal");
             }}
             className="hidden md:flex items-center gap-1.5 transition-all duration-300 hover:-translate-y-0.5"
             style={{
