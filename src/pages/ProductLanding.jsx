@@ -23,7 +23,7 @@ export default function ProductLanding() {
       <Navbar />
       <section className="py-20 px-6 bg-gradient-to-b from-primary/5 to-background">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="cs-section-eyebrow mb-4">AI Automation Storefront</p>
+          <p className="cs-section-eyebrow mb-4">AI Automation Packages</p>
           <h1 className="font-titles text-[#001B44] text-5xl md:text-6xl font-bold mb-6">
             Choose the AI System Your Business Needs
           </h1>

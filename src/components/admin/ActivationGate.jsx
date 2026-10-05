@@ -15,7 +15,7 @@ export default function ActivationGate({ installOS, onActivationChange }) {
       setLoading(true);
       const user = await base44.auth.me();
 
-      await base44.asServiceRole.entities.ClientInstallationOS.update(installOS.id, {
+      await base44.admin.entities.ClientInstallationOS.update(installOS.id, {
         activation_status: "activated",
         activation_approved_at: new Date().toISOString(),
         activation_approved_by: user?.email,

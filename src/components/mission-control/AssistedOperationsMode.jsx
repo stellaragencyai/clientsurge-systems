@@ -76,9 +76,9 @@ export default function AssistedOperationsMode() {
         const [obsRes, clientRes, leadsHot, leadsStale, failedEvents] = await Promise.all([
           base44.functions.invoke('getSystemObservabilityMetrics', {}).catch(() => null),
           base44.functions.invoke('getPlatformClientsOverview', {}).catch(() => null),
-          base44.asServiceRole.entities.Leads.filter({ intelligence_segment: 'HOT_LEADS' }, '-last_activity_at', 20).catch(() => []),
-          base44.asServiceRole.entities.Leads.filter({ lead_state: 'DORMANT' }, '-last_activity_at', 20).catch(() => []),
-          base44.asServiceRole.entities.CommunicationEvent.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
+          base44.admin.entities.Leads.filter({ intelligence_segment: 'HOT_LEADS' }, '-last_activity_at', 20).catch(() => []),
+          base44.admin.entities.Leads.filter({ lead_state: 'DORMANT' }, '-last_activity_at', 20).catch(() => []),
+          base44.admin.entities.CommunicationEvent.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
         ]);
 
         const obs = obsRes?.data?.observability || {};

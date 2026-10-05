@@ -24,11 +24,11 @@ export default function LeadRoutingCrmLinkageCard() {
     setError(null);
     try {
       // Fetch WebsiteLead records directly for counts
-      const websiteLeads = await base44.asServiceRole.entities.WebsiteLead.list("", 500).catch(() => []);
+      const websiteLeads = await base44.admin.entities.WebsiteLead.list("", 500).catch(() => []);
       const wl = websiteLeads || [];
 
       // Fetch latest backfill result
-      const results = await base44.asServiceRole.entities.LeadRoutingBackfillResult.list("-run_at", 5).catch(() => []);
+      const results = await base44.admin.entities.LeadRoutingBackfillResult.list("-run_at", 5).catch(() => []);
       const latestResult = (results || [])[0] || null;
 
       setCounts({

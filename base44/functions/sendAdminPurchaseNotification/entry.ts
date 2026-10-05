@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 /**
@@ -83,7 +84,7 @@ Deno.serve(async (req) => {
         </table>
       </div>`;
 
-      await fetch("https://api.resend.com/emails", {
+      await resendFetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({

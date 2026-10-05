@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
 const THEME = {
@@ -83,7 +84,7 @@ Deno.serve(async (req) => {
     const logoUrl = Deno.env.get("CLIENTSURGE_EMAIL_LOGO_URL") || Deno.env.get("CLIENTSURGE_LOGO_URL") || "";
     const html = buildDemoConfirmationHtml({ businessName: business_name || "there", formattedTime: formatted, auditBody: auditCopy.body, heading: auditCopy.heading, logoUrl });
 
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from: safeResendFrom(), reply_to: "nolan@clientsurgesystems.com", to: email, subject: `${auditCopy.subjectPrefix} - ${formatted}`, html }),

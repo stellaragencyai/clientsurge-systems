@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
 function buildBrandedEmail(heading, body) {
@@ -116,7 +117,7 @@ Deno.serve(async (req) => {
       `<p><strong>📅 ${formatted}</strong></p><p>${auditCopy.body}</p><p>Need to reschedule? Just reply to this email.</p>`
     );
 
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({

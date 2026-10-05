@@ -312,7 +312,7 @@ export function useClientNotifications({
 
 async function fetchProofLogs(deploymentId) {
   try {
-    return await base44.asServiceRole.entities.AutomationProofLog.filter(
+    return await base44.admin.entities.AutomationProofLog.filter(
       { client_deployment_id: deploymentId },
       "-tested_at",
       20
@@ -324,7 +324,7 @@ async function fetchProofLogs(deploymentId) {
 
 async function fetchExecLogs(deploymentId) {
   try {
-    return await base44.asServiceRole.entities.AutomationExecutionLog.filter(
+    return await base44.admin.entities.AutomationExecutionLog.filter(
       { client_deployment_id: deploymentId },
       "-created_date",
       30

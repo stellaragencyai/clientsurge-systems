@@ -49,6 +49,18 @@ test("Area 7 provider and webhook classifiers expose audit dimensions", () => {
   assert.ok(webhookRows.length > 0, "Webhook functions should be classified");
 });
 
+test("Area 7 function audit includes an authorization matrix", () => {
+  assert.ok(report.summary.by_authorization, "authorization buckets should be summarized");
+  assert.ok(Object.keys(report.summary.by_authorization).length > 0, "authorization buckets should not be empty");
+
+  for (const name of ["sendSMS", "sendInstantLeadResponseSms", "triggerVoiceCallToLead"]) {
+    const row = byName.get(name);
+    assert.equal(row.authorization, "admin_or_signed_internal", `${name} should require admin or signed internal invocation`);
+  }
+
+  assert.equal(byName.get("cancelSubscription")?.authorization, "owner_or_admin");
+});
+
 test("Area 7 audit detects deployed source-of-truth shape for entry/main functions", () => {
   const withEntry = rows.filter((row) => row.has_entry);
   const withMain = rows.filter((row) => row.has_main);

@@ -28,9 +28,9 @@
 - [ ] **Stripe Live Mode Verification**
   - Confirm STRIPE_SECRET_KEY & STRIPE_PUBLISHABLE_KEY active
   - Verify 3 products in live catalog:
-    - Starter (prod_UReWMpnZsCnfcL): $797 one-time, $497/mo
-    - Growth (prod_UReWhZsWks1HuA): $1297 one-time, $997/mo
-    - Elite (prod_UReW1LmsVbn4BZ): $2497 one-time, $1997/mo
+    - Starter (prod_UReWMpnZsCnfcL): $249 one-time, $99/mo
+    - Growth (prod_UReWhZsWks1HuA): $499 one-time, $249/mo
+    - Pro (prod_UReW1LmsVbn4BZ): $999 one-time, $499/mo
   - Test checkout session creation with metadata (base44_app_id)
   - Verify webhook signature validation (`STRIPE_WEBHOOK_SECRET`)
   - Test invoice generation & Stripe customer portal

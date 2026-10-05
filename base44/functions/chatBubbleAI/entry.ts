@@ -45,7 +45,7 @@ function containsSensitiveTopics(input) {
 const SYSTEM_PROMPT = `You are an AI assistant for ClientSurge Systems, an AI automation platform for local service businesses.
 You help potential clients understand:
 - What services we offer (AI lead response, missed call text-back, booking automation, review requests, nurture sequences, lead reactivation)
-- How our pricing works (Starter $797/$497mo, Growth $1297/$997mo, Elite $2497/$1997mo)
+- How our pricing works (Starter $249 setup/$99mo, Growth $499 setup/$249mo, Pro $999 setup/$499mo)
 - How the setup process works (5-7 business days, remote setup)
 - How to book a consultation
 

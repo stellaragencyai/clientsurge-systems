@@ -21,7 +21,7 @@ export default function TaskStatusDashboard() {
   const load = async () => {
     setLoading(true);
     try {
-      const t = await base44.asServiceRole.entities.ProjectTask.list("-created_date", 200);
+      const t = await base44.admin.entities.ProjectTask.list("-created_date", 200);
       setTasks(t || []);
     } catch {}
     setLoading(false);

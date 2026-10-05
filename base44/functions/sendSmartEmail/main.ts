@@ -6,18 +6,26 @@ import { secureJson } from "../_shared/response.ts";
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { buildResendEmailPayload } from "../_shared/emailPayload.js";
 import { resendFetch } from "../_shared/resendFetch.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const DEFAULT_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "system@clientsurgesystems.com";
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return secureJson({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
+    }
+
     const base44 = createClientFromRequest(req);
+    const user = await requireAdminUser(base44);
     const { lead_id, email_body, campaign_type, intent, from_email } = await req.json();
 
-    if (!lead_id || !email_body || !from_email) {
+    if (!lead_id || !email_body) {
       return secureJson(
-        { error: "lead_id, email_body, and from_email required" },
+        { error: "lead_id and email_body required" },
         { status: 400 }
       );
     }
@@ -57,13 +65,13 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: from_email,
+      body: JSON.stringify(buildResendEmailPayload({
+        from: DEFAULT_FROM_EMAIL,
         to: lead.email,
         subject,
         html: email_body,
-        reply_to: from_email,
-      }),
+        ...(from_email ? { reply_to: from_email } : {}),
+      })),
     });
 
     if (!emailResponse.ok) {
@@ -75,7 +83,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const resendData = await emailsecureJson();
+    const resendData = await emailResponse.json().catch(() => ({}));
 
     // 4. Log communication event
     await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -91,6 +99,7 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({
         campaign_type,
         intent,
+        admin_email: user.email || null,
         subject_line_strategy: subjectResult.data.alternatives[0]?.strategy,
         estimated_open_rate: subjectResult.data.alternatives[0]?.estimated_open_rate,
       }),
@@ -108,6 +117,13 @@ Deno.serve(async (req) => {
       estimated_open_rate: subjectResult.data.alternatives[0]?.estimated_open_rate,
     });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return secureJson(
+        { error: error.message, code: error.code, success: false },
+        { status: error.status }
+      );
+    }
+
     console.error("[SmartEmail] Error:", error.message);
     return secureJson(
       { error: error.message, success: false },

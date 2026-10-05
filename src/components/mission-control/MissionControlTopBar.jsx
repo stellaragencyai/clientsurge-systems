@@ -10,7 +10,7 @@ export default function MissionControlTopBar({ onMenuToggle, onPanelToggle }) {
   React.useEffect(() => {
     const loadAlerts = async () => {
       try {
-        const result = await base44.asServiceRole.entities.Alert.filter({}, '-created_date', 5);
+        const result = await base44.admin.entities.Alert.filter({}, '-created_date', 5);
         setAlerts(result || []);
       } catch (e) {
         console.error('Failed to load alerts:', e);

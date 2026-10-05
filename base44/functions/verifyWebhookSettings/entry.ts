@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 Deno.serve(async (req) => {
@@ -104,7 +105,7 @@ Deno.serve(async (req) => {
     // ── 5. Live ping Resend API ──
     try {
       if (resendApiKey) {
-        const res = await fetch('https://api.resend.com/domains', {
+        const res = await resendFetch('https://api.resend.com/domains', {
           headers: { 'Authorization': `Bearer ${resendApiKey}` },
         });
         results.resend.api_ping = res.ok;

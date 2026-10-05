@@ -3,5 +3,14 @@ main = "cloudflare/clientsurge-security-telegram-wrapper.mjs"
 compatibility_date = "2026-04-23"
 workers_dev = false
 
-# Production routes are managed in the Cloudflare dashboard. Keeping routes out of
-# this file lets the CI token deploy Worker code without mutating zone routing.
+routes = [
+  { pattern = "clientsurgesystems.com", custom_domain = true },
+  { pattern = "*clientsurgesystems.com/*", zone_name = "clientsurgesystems.com" },
+  { pattern = "clientsurgesystems.com/*", zone_name = "clientsurgesystems.com" },
+  { pattern = "www.clientsurgesystems.com/*", zone_name = "clientsurgesystems.com" },
+]
+
+[[d1_databases]]
+binding = "ANALYTICS_DB"
+database_name = "clientsurge-visitor-analytics"
+database_id = "9d0df58b-e737-4289-94d8-24c4a10747be"

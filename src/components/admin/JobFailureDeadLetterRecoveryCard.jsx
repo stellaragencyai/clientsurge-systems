@@ -46,11 +46,11 @@ export default function JobFailureDeadLetterRecoveryCard() {
     setError(null);
     try {
       const [allJobs, allEvents, pendingDeadLetters, resolvedDeadLetters, latestResult] = await Promise.all([
-        base44.asServiceRole.entities.AutomationJob.list("", 500).catch(() => []),
-        base44.asServiceRole.entities.EventQueue.list("", 500).catch(() => []),
-        base44.asServiceRole.entities.DeadLetterLog.filter({ status: "pending_review" }, "-created_date", 500).catch(() => []),
-        base44.asServiceRole.entities.DeadLetterLog.filter({ status: "resolved" }, "-created_date", 500).catch(() => []),
-        base44.asServiceRole.entities.FailureRecoveryResult.list("-run_at", 3).catch(() => []),
+        base44.admin.entities.AutomationJob.list("", 500).catch(() => []),
+        base44.admin.entities.EventQueue.list("", 500).catch(() => []),
+        base44.admin.entities.DeadLetterLog.filter({ status: "pending_review" }, "-created_date", 500).catch(() => []),
+        base44.admin.entities.DeadLetterLog.filter({ status: "resolved" }, "-created_date", 500).catch(() => []),
+        base44.admin.entities.FailureRecoveryResult.list("-run_at", 3).catch(() => []),
       ]);
 
       const jobs = allJobs || [];

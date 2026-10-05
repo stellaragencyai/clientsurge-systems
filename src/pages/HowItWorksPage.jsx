@@ -116,7 +116,7 @@ export default function HowItWorksPage() {
         <section className="pt-[calc(var(--cs-nav-height)+48px)] pb-16 px-6 bg-white">
           <div className="max-w-3xl mx-auto text-left">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-4">
-              Business AI Automation Store
+              Business AI Automation Packages
             </p>
             <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground leading-tight mb-4">
               How the ClientSurge AI Brain Turns a Business Signup Into a Remote Setup Plan
@@ -129,10 +129,10 @@ export default function HowItWorksPage() {
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/store"
+                to="/pricing"
                 className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
               >
-                Browse AI Automation Systems
+                Compare AI Automation Systems
               </Link>
             </div>
           </div>
@@ -270,8 +270,8 @@ export default function HowItWorksPage() {
               <Link to="/start" className="cs-btn-primary" style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.875rem" }}>
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link to="/store" className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
-                Browse Automation Store
+              <Link to="/pricing" className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
+                Compare Packages
               </Link>
               <Link to="/book" className="inline-flex items-center rounded-lg border border-border bg-background px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:bg-muted transition-colors">
                 Book a Free Audit

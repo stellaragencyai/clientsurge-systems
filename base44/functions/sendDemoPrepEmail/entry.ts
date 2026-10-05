@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 function safeResendFrom() {
@@ -71,7 +72,7 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${resendApiKey}`,

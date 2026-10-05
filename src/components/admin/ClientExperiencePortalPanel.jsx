@@ -34,7 +34,7 @@ export default function ClientExperiencePortalPanel() {
 
   const fetchPortals = async () => {
     try {
-      const data = await base44.asServiceRole.entities.ClientExperiencePortal.list('-created_date', 100);
+      const data = await base44.admin.entities.ClientExperiencePortal.list('-created_date', 100);
       setPortals(data || []);
     } catch (err) {
       console.error('Failed to fetch portals:', err);
@@ -45,7 +45,7 @@ export default function ClientExperiencePortalPanel() {
 
   const handleToggleAccess = async (portal) => {
     try {
-      await base44.asServiceRole.entities.ClientExperiencePortal.update(portal.id, {
+      await base44.admin.entities.ClientExperiencePortal.update(portal.id, {
         portal_access_enabled: !portal.portal_access_enabled,
       });
       setPortals(portals.map(p => p.id === portal.id ? { ...p, portal_access_enabled: !p.portal_access_enabled } : p));
@@ -68,7 +68,7 @@ export default function ClientExperiencePortalPanel() {
 
   const handleStatusChange = async (portal, newStatus) => {
     try {
-      await base44.asServiceRole.entities.ClientExperiencePortal.update(portal.id, {
+      await base44.admin.entities.ClientExperiencePortal.update(portal.id, {
         portal_status: newStatus,
       });
       setPortals(portals.map(p => p.id === portal.id ? { ...p, portal_status: newStatus } : p));

@@ -1,5 +1,6 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 
 Deno.serve(async (req) => {
   try {
@@ -8,10 +9,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user || user.role !== "admin") {
-      return secureJson({ error: "Admin access required" }, { status: 403 });
-    }
+    await requireAdminUser(base44);
 
     const payload = await req.json();
     const { order_id, shared, services } = payload || {};
@@ -62,6 +60,10 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update install configuration";
+    if (error instanceof AuthGuardError) {
+      return secureJson({ error: message, code: error.code }, { status: error.status });
+    }
+
     const status =
       message === "Admin access required" ? 403 :
       message === "Order not found" ? 404 :

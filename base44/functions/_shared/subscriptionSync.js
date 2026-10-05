@@ -13,6 +13,7 @@ import {
   getServiceProductByKey,
   getServiceProductByMonthlyPriceId,
 } from "../../../src/lib/salesCatalog.js";
+import { createSystemAuditLog } from "./billingAudit.js";
 
 const ACTIVE_SUBSCRIPTION_STATUSES = new Set(["active", "trialing"]);
 const PAST_DUE_SUBSCRIPTION_STATUSES = new Set(["past_due", "unpaid", "incomplete", "incomplete_expired"]);
@@ -139,6 +140,7 @@ async function upsertSubscriptionRecord({
   snapshot,
   now,
   requestPatch = {},
+  eventType = "",
 }) {
   const existing =
     (snapshot.stripe_subscription_id
@@ -165,13 +167,43 @@ async function upsertSubscriptionRecord({
   };
 
   if (existing) {
-    return base44.asServiceRole.entities.Subscription.update(existing.id, patch);
+    const updatedSubscription = await base44.asServiceRole.entities.Subscription.update(existing.id, patch);
+    await createSystemAuditLog(base44, {
+      action: "stripe_subscription_record_update",
+      entityName: "Subscription",
+      recordId: updatedSubscription.id,
+      before: existing,
+      after: updatedSubscription,
+      source: "subscriptionSync",
+      provider: "stripe",
+      providerEventType: eventType,
+      notes: {
+        stripe_subscription_id: snapshot.stripe_subscription_id,
+        order_id: order.id,
+      },
+    });
+    return updatedSubscription;
   }
 
-  return base44.asServiceRole.entities.Subscription.create({
+  const createdSubscription = await base44.asServiceRole.entities.Subscription.create({
     ...patch,
     created_at: now,
   });
+  await createSystemAuditLog(base44, {
+    action: "stripe_subscription_record_create",
+    entityName: "Subscription",
+    recordId: createdSubscription.id,
+    before: null,
+    after: createdSubscription,
+    source: "subscriptionSync",
+    provider: "stripe",
+    providerEventType: eventType,
+    notes: {
+      stripe_subscription_id: snapshot.stripe_subscription_id,
+      order_id: order.id,
+    },
+  });
+  return createdSubscription;
 }
 
 function getAccessStateForSubscription(status) {
@@ -401,6 +433,7 @@ export async function syncSubscriptionFromStripe({
     order,
     snapshot,
     now,
+    eventType,
   });
   const updatedOrder = await updateOrderForSubscription({
     base44,
@@ -408,6 +441,20 @@ export async function syncSubscriptionFromStripe({
     subscriptionRecord,
     snapshot,
     now,
+  });
+  await createSystemAuditLog(base44, {
+    action: "stripe_subscription_order_sync",
+    entityName: "Order",
+    recordId: updatedOrder.id,
+    before: order,
+    after: updatedOrder,
+    source: "subscriptionSync",
+    provider: "stripe",
+    providerEventType: eventType,
+    notes: {
+      stripe_subscription_id: stripeSubscription?.id || "",
+      subscription_entity_id: subscriptionRecord.id,
+    },
   });
 
   await base44.asServiceRole.entities.CommunicationEvent.create(
@@ -470,6 +517,20 @@ export async function requestSubscriptionChange({
     change_request_status: "pending_review",
     cancel_requested_at: requestType === "cancel" ? now : subscription.cancel_requested_at || undefined,
     updated_at: now,
+  });
+  await createSystemAuditLog(base44, {
+    action: "subscription_change_request",
+    entityName: "Subscription",
+    recordId: nextSubscription.id,
+    before: subscription,
+    after: nextSubscription,
+    source: "requestSubscriptionChange",
+    provider: "",
+    notes: {
+      requested_by_email: requestedByEmail || null,
+      request_type: requestType,
+      order_id: order.id,
+    },
   });
 
   if (order.client_project_id) {

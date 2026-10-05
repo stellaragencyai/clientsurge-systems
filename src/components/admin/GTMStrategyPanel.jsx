@@ -5,7 +5,7 @@ const TIERS = [
   {
     name: 'Starter System',
     tagline: 'Entry-level automation adoption',
-    price: '$497/mo + $797 setup',
+    price: '$99/mo + $249 setup',
     color: 'border-gray-200 bg-gray-50',
     headerColor: 'bg-gray-100 border-gray-200',
     badgeColor: 'bg-gray-200 text-gray-700',
@@ -25,7 +25,7 @@ const TIERS = [
   {
     name: 'Growth System',
     tagline: 'Operational automation replacement',
-    price: '$997/mo + $1,297 setup',
+    price: '$249/mo + $499 setup',
     color: 'border-blue-200 bg-blue-50',
     headerColor: 'bg-blue-600 border-blue-600',
     badgeColor: 'bg-blue-600 text-white',
@@ -49,7 +49,7 @@ const TIERS = [
   {
     name: 'Pro System',
     tagline: 'Full business operating system',
-    price: '$1,997/mo + $2,497 setup',
+    price: '$499/mo + $999 setup',
     color: 'border-purple-200 bg-purple-50',
     headerColor: 'bg-purple-700 border-purple-700',
     badgeColor: 'bg-purple-700 text-white',
@@ -343,7 +343,7 @@ export default function GTMStrategyPanel() {
               headline: 'Full business operating system',
               logic: 'Sell to high-volume operators, agencies, or businesses with multiple locations. Pro replaces an ops manager role entirely.',
               objection: '"That\'s expensive."',
-              answer: 'At $1,997/mo, if it books 2 extra clients per month, it pays for itself 3x over.',
+              answer: 'At $499/mo, if it books 1 extra client per month, it can pay for itself quickly.',
             },
           ].map(({ tier, color, headline, logic, objection, answer }) => (
             <div key={tier} className={`rounded-lg border p-5 ${color}`}>

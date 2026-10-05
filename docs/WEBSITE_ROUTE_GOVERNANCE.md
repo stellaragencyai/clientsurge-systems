@@ -18,11 +18,11 @@ Source of truth: `src/App.jsx`, `src/lib/publicRouteMetadata.js`, `src/lib/route
 | Route | Purpose | User Type | Launch Status | Indexing Status | Primary CTA | Notes |
 |---|---|---|---|---|---|---|
 | `/` | Primary marketing homepage | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Anchors handle pricing, FAQ, system, and testimonials sections. |
-| `/start` | Guided audit/start flow | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Public app-shell route and sitemap route. |
-| `/book` | Free automation audit booking | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Canonical destination for audit CTAs. |
+| `/start` | Guided audit/start flow | Public visitor | Ready for controlled launch | Noindex | Free Automation Audit | Public app-shell utility route; keep out of sitemap. |
+| `/book` | Free automation audit booking | Public visitor | Ready for controlled launch | Noindex | Free Automation Audit | Public app-shell utility route; keep out of sitemap. |
 | `/book-demo` | Legacy booking alias | Public visitor | Redirect only | No sitemap | Free Automation Audit | Redirects to `/book`; keep for old links only. |
 | `/contact` | General contact path | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Includes audit alternative. |
-| `/store` | Package and service storefront | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Checkout behavior still depends on Stripe launch readiness. |
+| `/store` | Package and service storefront | Public visitor | Ready for controlled launch | Noindex | Free Automation Audit | Reachable utility route; primary package discovery stays on `/pricing`. |
 | `/automations` | Automation systems overview | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Removed launch-visible coming-soon copy. |
 | `/industries` | Industry directory | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Links only to live canonical industry routes. |
 | `/about` | Company overview | Public visitor | Ready for controlled launch | Index | Free Automation Audit | Footer and nav link target. |

@@ -151,7 +151,7 @@ export default function UnifiedOnboardingProgress() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const allOrch = await base44.asServiceRole.entities.OnboardingOrchestration.filter({}, '-created_date', 500);
+      const allOrch = await base44.admin.entities.OnboardingOrchestration.filter({}, '-created_date', 500);
       setOrchestrations(allOrch || []);
     } catch (err) {
       console.error('Failed to fetch orchestrations:', err);

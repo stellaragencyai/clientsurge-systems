@@ -327,7 +327,7 @@ export default function Industries() {
                 height="442"
                 className="absolute inset-0 h-full w-full object-cover mix-blend-luminosity opacity-[0.22]"
                 style={{ filter: "grayscale(0.35) saturate(0.7) contrast(1.05) brightness(0.78)" }}
-                fetchpriority={index === 0 ? "high" : "auto"}
+                fetchPriority={index === 0 ? "high" : "auto"}
               />
 
               {industryPatterns[industry.id]}

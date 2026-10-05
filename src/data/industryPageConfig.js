@@ -74,7 +74,7 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'HVAC Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: [
           'AI Instant Response (SMS)',
           'Missed Call SMS Recovery',
@@ -82,7 +82,7 @@ export const INDUSTRY_CONFIG = {
       },
       growth: {
         label: 'HVAC Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: [
           'AI Instant Response (SMS + Email)',
           'Missed Call SMS + Email Recovery',
@@ -174,12 +174,12 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Plumbing Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: ['Missed Call SMS Recovery', 'Emergency Inquiry Intake'],
       },
       growth: {
         label: 'Plumbing Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: ['SMS + Email Follow-Up', 'Dispatch Detail Capture', 'Lead Quality Scoring', 'Booking Link Handoff'],
       },
       pro: {
@@ -261,7 +261,7 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Contractor Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: [
           'AI Instant Response (SMS)',
           'Missed Call Recovery',
@@ -269,7 +269,7 @@ export const INDUSTRY_CONFIG = {
       },
       growth: {
         label: 'Contractor Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: [
           'AI Instant Response (SMS + Email)',
           'Missed Call + Email Recovery',
@@ -361,12 +361,12 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Contractor Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: ['Missed Call Recovery', 'Basic Project Intake'],
       },
       growth: {
         label: 'Contractor Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: ['SMS + Email Follow-Up', 'Estimate Nurture', 'Project Qualification', 'Booking Link Handoff'],
       },
       pro: {
@@ -448,7 +448,7 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Dental Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: [
           'Instant Appointment Booking',
           'Missed Call SMS Response',
@@ -456,7 +456,7 @@ export const INDUSTRY_CONFIG = {
       },
       growth: {
         label: 'Dental Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: [
           'Instant Appointment Booking',
           'Missed Call SMS + Email Response',
@@ -548,12 +548,12 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Med Spa Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: ['Missed Call Text-Back', 'Treatment Inquiry Capture'],
       },
       growth: {
         label: 'Med Spa Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: ['SMS + Email Nurture', 'Consult Booking Handoff', 'No-Show Follow-Up', 'Package Lead Nurture'],
       },
       pro: {
@@ -637,7 +637,7 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Chiropractic Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: [
           'Appointment Reminders (SMS)',
           'Missed Call SMS Recovery',
@@ -645,7 +645,7 @@ export const INDUSTRY_CONFIG = {
       },
       growth: {
         label: 'Chiropractic Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: [
           'Smart Appointment Reminders (SMS + Email)',
           'Post-Visit Follow-Up Automation',
@@ -737,7 +737,7 @@ export const INDUSTRY_CONFIG = {
     systemMapping: {
       starter: {
         label: 'Veterinary Starter',
-        price: '$497/month',
+        price: '$99/month',
         features: [
           'Missed Call Text-Back',
           'Appointment Inquiry Capture',
@@ -745,7 +745,7 @@ export const INDUSTRY_CONFIG = {
       },
       growth: {
         label: 'Veterinary Growth',
-        price: '$997/month',
+        price: '$249/month',
         features: [
           'SMS + Email Follow-Up',
           'Appointment Reminders',

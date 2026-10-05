@@ -12,15 +12,15 @@ const EXPECTED_PACKAGES = [
   {
     package_key: "starter_system",
     customer_facing_name: "Starter",
-    setup_total: 797,
-    monthly_total: 497,
+    setup_total: 249,
+    monthly_total: 99,
     service_keys: ["instant_lead_response", "missed_call_text_back"],
   },
   {
     package_key: "growth_system",
     customer_facing_name: "Growth",
-    setup_total: 1297,
-    monthly_total: 997,
+    setup_total: 499,
+    monthly_total: 249,
     service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -31,8 +31,8 @@ const EXPECTED_PACKAGES = [
   {
     package_key: "pro_system",
     customer_facing_name: "Pro",
-    setup_total: 2497,
-    monthly_total: 1997,
+    setup_total: 999,
+    monthly_total: 499,
     service_keys: [
       "instant_lead_response",
       "missed_call_text_back",

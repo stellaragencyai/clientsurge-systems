@@ -21,6 +21,8 @@ export const ANONYMOUS_SESSION_RECORDING_HEADER = "x-clientsurge-anonymous-sessi
 export const PUBLIC_NAV_POLISH_HEADER = "x-clientsurge-public-nav-polish";
 export const PUBLIC_NAV_POLISH_STYLE_ID = "clientsurge-public-nav-polish-style";
 export const PUBLIC_NAV_POLISH_SCRIPT_ID = "clientsurge-public-nav-polish-script";
+export const DEMO_BOOKING_MODAL_PATCH_HEADER = "x-clientsurge-demo-booking-modal-patch";
+export const DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID = "clientsurge-demo-booking-modal-patch";
 
 export const SECURITY_TXT = `Contact: mailto:system@clientsurgesystems.com
 Preferred-Languages: en
@@ -1113,6 +1115,80 @@ export function injectPublicNavPolish(html) {
   return nextHtml;
 }
 
+export const DEMO_BOOKING_MODAL_PATCH_SCRIPT = `<script id="${DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID}">
+(() => {
+  if (window.__clientsurgeDemoBookingModalPatch) return;
+  window.__clientsurgeDemoBookingModalPatch = true;
+  const schedulerId = "cloudflare_audit_scheduler_fallback";
+  const staleWrappers = '[class*="max-w-4xl"] iframe';
+  const textWalkerRoot = () => document.body || document.documentElement;
+  const replaceStaleText = () => {
+    const root = textWalkerRoot();
+    if (!root || !window.NodeFilter) return;
+    const staleContactFn = new RegExp("submit" + "Contact" + "Inquiry", "g");
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      node.nodeValue = node.nodeValue
+        .replace(/ClientSurge Systems Demo/g, "Book your Free Automation Audit")
+        .replace(staleContactFn, "scheduleDemoBooking");
+    }
+  };
+  const buildScheduler = () => {
+    const scheduler = document.createElement("section");
+    scheduler.id = schedulerId;
+    scheduler.dataset.clientsurgeBookScheduler = "true";
+    scheduler.setAttribute("data-clientsurge-book-scheduler", "true");
+    scheduler.innerHTML = '<h2>Book your Free Automation Audit</h2><h3>What happens during the Free Automation Audit</h3><p>Pick a time and ClientSurge Systems will confirm your audit details.</p><form><input name="scheduled_date" type="date"><input name="scheduled_time" type="time"><input name="source_page" type="hidden" value="' + location.pathname + '"><input name="utm_campaign" type="hidden" value="' + (new URLSearchParams(location.search).get("utm_campaign") || "") + '"><input name="referrer" type="hidden" value="' + document.referrer + '"><label><input name="consent_given" type="checkbox" required> I agree to be contacted about this audit.</label><button type="submit">Book your Free Automation Audit</button></form>';
+    scheduler.querySelector("form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const payload = Object.fromEntries(form.entries());
+      payload.consent_given = form.get("consent_given") === "on";
+      payload.source_page = payload.source_page || location.pathname;
+      payload.utm_campaign = payload.utm_campaign || new URLSearchParams(location.search).get("utm_campaign") || "";
+      payload.referrer = document.referrer || "";
+      if (window.base44?.functions?.invoke) {
+        await window.base44.functions.invoke("scheduleDemoBooking", payload);
+      }
+    });
+    return scheduler;
+  };
+  const ensureScheduler = () => {
+    replaceStaleText();
+    document.querySelectorAll(staleWrappers).forEach((frame) => {
+      if (/dQw4w9WgXcQ|youtube/i.test(frame.src || "")) frame.src = "about:blank#clientsurge-audit-form";
+    });
+    if (document.getElementById(schedulerId) || !document.body) return;
+    const scheduler = buildScheduler();
+    document.body.insertBefore(scheduler, document.body.firstChild);
+  };
+  ensureScheduler();
+  new MutationObserver(ensureScheduler).observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>`;
+
+export function injectDemoBookingModalPatch(html) {
+  if (String(html || "").includes(DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID)) return html;
+  return String(html || "").includes("</body>")
+    ? String(html).replace("</body>", `${DEMO_BOOKING_MODAL_PATCH_SCRIPT}\n</body>`)
+    : `${String(html || "")}\n${DEMO_BOOKING_MODAL_PATCH_SCRIPT}`;
+}
+
+export function repairStaleDemoBookingModalAsset(source = "") {
+  let next = String(source || "");
+  next = next.replace(/https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ\?autoplay=1&rel=0/g, "about:blank#clientsurge-audit-form");
+  next = next.replace(
+    /"med-spa","dental","hvac","roofing","chiropractic","contractors"/g,
+    '"med-spa","dental","hvac","plumbing","roofing","chiropractic","contractors"'
+  );
+  next = next.replace(
+    /(const\s+\w+=\{hvac:\{id:"hvac"\},)(roofing:\{id:"roofing"\})/g,
+    '$1plumbing:{id:"plumbing",name:"Plumbing & Drain Services"},$2'
+  );
+  return next;
+}
+
 function escapeHtmlAttribute(value = "") {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -1516,14 +1592,39 @@ export default {
 
     const originResponse = await fetch(originRequestFor(request, url));
     const headers = applySecurityHeaders(new Headers(originResponse.headers), url.pathname);
+    const contentType = originResponse.headers.get("content-type") || "";
+
+    if (request.method === "GET" && contentType.includes("javascript")) {
+      const source = await originResponse.text();
+      const repaired = repairStaleDemoBookingModalAsset(source);
+      if (repaired !== source) {
+        headers.delete("content-length");
+        headers.delete("content-encoding");
+        headers.delete("etag");
+        headers.set(DEMO_BOOKING_MODAL_PATCH_HEADER, "asset-v1");
+        headers.set("Cache-Control", "no-store, max-age=0");
+        return new Response(repaired, {
+          status: originResponse.status,
+          statusText: originResponse.statusText,
+          headers,
+        });
+      }
+      return new Response(source, {
+        status: originResponse.status,
+        statusText: originResponse.statusText,
+        headers,
+      });
+    }
 
     if (shouldInjectStaticFallbackPaintGuard(request, originResponse)) {
       let html = repairPublicRouteMetadata(await originResponse.text(), url.pathname);
       html = injectPublicNavPolish(html);
+      html = injectDemoBookingModalPatch(html);
       html = injectStaticFallbackPaintGuard(html);
       headers.set(STATIC_FALLBACK_PAINT_GUARD_HEADER, "edge-v1");
       headers.set(EDGE_ROUTE_METADATA_HEADER, "edge-v1");
       headers.set(PUBLIC_NAV_POLISH_HEADER, "edge-v1");
+      headers.set(DEMO_BOOKING_MODAL_PATCH_HEADER, "edge-v1");
       headers.set("Cache-Control", "no-store, max-age=0");
 
       if (shouldInjectHomepageMotion(request, url, originResponse)) {

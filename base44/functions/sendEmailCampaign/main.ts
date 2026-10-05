@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 import { createEmailUnsubscribeToken } from "../_shared/emailUnsubscribe.ts";
@@ -366,7 +367,7 @@ Deno.serve(async (req) => {
           readiness.postal_address,
         );
 
-        const response = await fetch("https://api.resend.com/emails", {
+        const response = await resendFetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({

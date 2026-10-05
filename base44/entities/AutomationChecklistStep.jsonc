@@ -127,28 +127,9 @@
       ]
     },
     "update": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "data.order_id": {
-            "$in": [
-              "{{client_projects.order_id}}"
-            ]
-          }
-        },
-        {
-          "data.client_id": "{{client_id}}"
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "user_condition": {

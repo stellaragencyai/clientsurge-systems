@@ -84,11 +84,24 @@ jobs:
       - name: Smoke product signup route
         run: node scripts/product-signup-route-smoke.mjs
 
+      - name: Cloudflare security Worker dry-run
+        run: npm run cloudflare:security:dry-run
+
+      - name: Cloudflare route diagnosis audit
+        continue-on-error: true
+        run: |
+          mkdir -p tmp
+          set +e
+          npm run cloudflare:security:diagnose-route -- --json > tmp/cloudflare-route-diagnosis.json 2>&1
+          echo "$?" > tmp/cloudflare-route-diagnosis.exitcode
+          exit 0
+
       - name: Write release gate proof artifact
         run: |
           mkdir -p tmp
           node - <<'NODE'
           const fs = require('node:fs');
+          const readOptional = (path) => fs.existsSync(path) ? fs.readFileSync(path, 'utf8').trim() : null;
           const proof = {
             ok: true,
             proof_type: 'clientsurge_release_gate',
@@ -105,17 +118,35 @@ jobs:
             required_steps: [
               'npm run build',
               'npm run test:release-gate:node',
-              'node scripts/product-signup-route-smoke.mjs'
+              'node scripts/product-signup-route-smoke.mjs',
+              'npm run cloudflare:security:dry-run'
             ],
             non_blocking_audits: [
               'npm run test:deno',
               'npm run test:node',
-              'npm run smoke:public-routes'
+              'npm run smoke:public-routes',
+              'npm run cloudflare:security:diagnose-route -- --json'
             ],
+            cloudflare_route_diagnosis: {
+              exit_code: readOptional('tmp/cloudflare-route-diagnosis.exitcode'),
+              artifact_path: 'tmp/cloudflare-route-diagnosis.json',
+              note: 'Non-blocking until the live custom-domain route is repaired; launch policy still requires production-security verification to pass.'
+            },
             downstream_workflow: 'Base44 Auto Publish',
           };
           fs.writeFileSync(process.env.RELEASE_GATE_PROOF_PATH, `${JSON.stringify(proof, null, 2)}\n`);
           NODE
+
+      - name: Upload Cloudflare route diagnosis artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clientsurge-cloudflare-route-diagnosis-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tmp/cloudflare-route-diagnosis.json
+            tmp/cloudflare-route-diagnosis.exitcode
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Upload release gate proof artifact
         if: always()
@@ -132,6 +163,7 @@ jobs:
           echo "## ClientSurge Release Gate" >> "$GITHUB_STEP_SUMMARY"
           echo "- Workflow run: $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT" >> "$GITHUB_STEP_SUMMARY"
           echo "- Commit: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Required build/test/product-signup proof completed before artifact generation." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Required build/test/product-signup/Cloudflare dry-run proof completed before artifact generation." >> "$GITHUB_STEP_SUMMARY"
           echo "- Proof artifact: clientsurge-release-gate-proof-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Cloudflare route diagnosis artifact: clientsurge-cloudflare-route-diagnosis-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_STEP_SUMMARY"
           echo "- Downstream publish workflow: Base44 Auto Publish via workflow_run on successful main gate." >> "$GITHUB_STEP_SUMMARY"

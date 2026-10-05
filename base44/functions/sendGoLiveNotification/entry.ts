@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
 function secureJson(data = {}, init = {}) {
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
     const logoUrl = Deno.env.get("CLIENTSURGE_EMAIL_LOGO_URL") || Deno.env.get("CLIENTSURGE_LOGO_URL") || "";
 
     if (customerEmail && resendKey) {
-      await fetch("https://api.resend.com/emails", {
+      await resendFetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({ from: fromEmail, reply_to: "nolan@clientsurgesystems.com", to: customerEmail, subject: `You're Live — ${businessName} AI System is Running`, html: buildLiveEmail({ customerName, businessName, portalUrl, logoUrl }) }),

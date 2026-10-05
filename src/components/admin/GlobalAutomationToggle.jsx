@@ -17,7 +17,7 @@ export default function GlobalAutomationToggle() {
   useEffect(() => {
     const load = async () => {
       try {
-        const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+        const settings = await base44.admin.entities.AdminSettings.list("-created_date", 1);
         if (settings?.[0]) {
           setSettingsId(settings[0].id);
           // Use a description field as a flag store (since no dedicated field exists yet)
@@ -36,10 +36,10 @@ export default function GlobalAutomationToggle() {
     const newPaused = !paused;
     try {
       if (settingsId) {
-        const current = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+        const current = await base44.admin.entities.AdminSettings.list("-created_date", 1);
         const desc = (current?.[0]?.description || "").replace(/AUTOMATIONS_PAUSED=(true|false)/g, "").trim();
         const newDesc = `${desc} AUTOMATIONS_PAUSED=${newPaused}`.trim();
-        await base44.asServiceRole.entities.AdminSettings.update(settingsId, { description: newDesc });
+        await base44.admin.entities.AdminSettings.update(settingsId, { description: newDesc });
       }
       setPaused(newPaused);
       setFeedback(newPaused ? "All automations paused." : "Automations resumed.");

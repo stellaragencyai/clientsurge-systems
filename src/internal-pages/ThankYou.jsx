@@ -6,17 +6,17 @@ import { getPackageOffer, normalizePackageKey } from "@/lib/salesCatalog";
 const PLANS = {
   starter_system: {
     name: "Starter",
-    price: "$797 Setup + $497/month",
+    price: "$249 Setup + $99/month",
     includes: "Includes: Instant Lead Response + Missed Call Text-Back",
   },
   growth_system: {
     name: "Growth",
-    price: "$1,297 Setup + $997/month",
+    price: "$499 Setup + $249/month",
     includes: "Includes: Instant Lead Response, Missed Call Text-Back, 14-Day Nurture Sequence + AI Booking Agent",
   },
   pro_system: {
     name: "Pro",
-    price: "$2,497 Setup + $1,997/month",
+    price: "$999 Setup + $499/month",
     includes: "Includes: All 6 Automations — fully built and live",
   },
 };

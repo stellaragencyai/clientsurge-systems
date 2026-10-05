@@ -282,7 +282,7 @@ export const CANONICAL_SERVICE_PRODUCTS = PUBLIC_STORE_PRODUCTS.filter(
   (product) => product.checkout_enabled
 );
 
-const PACKAGE_DEFINITIONS = [
+export const PACKAGE_DEFINITIONS = [
   {
     package_key: "starter_system",
     name: "Starter System",
@@ -836,7 +836,7 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
   const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
   const packageStripeIds = resolvePackageStripeIds(packageOffer);
 
-  if (!packageStripeIds.monthly_price_id) {
+  if (!packageStripeIds.setup_price_id || !packageStripeIds.monthly_price_id) {
     throw new Error("Live checkout currently requires a Starter, Growth, or Pro package bundle.");
   }
 
@@ -844,29 +844,9 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
     throw new Error("Live checkout currently supports package bundles only; add-on checkout is not enabled.");
   }
 
-  const implementationFee = Number(packageOffer?.implementation_fee || 0);
-  if (!implementationFee || implementationFee <= 0) {
-    throw new Error("Professional AI Implementation fee is not configured for this package.");
-  }
-
   return [
     {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: `${packageOffer.name} — ${IMPLEMENTATION_LABEL} (One-Time)`,
-          description:
-            "Required one-time implementation: AI platform configuration, CRM integration, Google Business Profile integration, calendar integration, AI receptionist deployment, SMS & email automation setup, workflow configuration, testing & quality assurance, and go-live support.",
-          metadata: {
-            catalog_version: "canonical_sales_catalog_v1",
-            package_key: packageOffer.package_key,
-            package_display_name: packageOffer.name,
-            charge_type: "implementation_fee",
-            billing_phase: "initial",
-          },
-        },
-        unit_amount: toCents(implementationFee),
-      },
+      price: packageStripeIds.setup_price_id,
       quantity: 1,
     },
     {

@@ -1,4 +1,5 @@
 export const PIPELINE_STATUSES = [
+  "Pending Payment",
   "Paid",
   "Ready for Install",
   "Configuring",
@@ -153,6 +154,7 @@ const PACKAGE_ACTIVATION_DEFINITIONS = {
 };
 
 const STATUS_TO_LEGACY_ITEM_STATUS = {
+  "Pending Payment": "pending",
   Paid: "pending",
   "Ready for Install": "pending",
   Configuring: "setting_up",
@@ -200,6 +202,7 @@ const REQUIRED_SERVICE_CONFIGURATION = {
 };
 
 const ALLOWED_STATUS_TRANSITIONS = {
+  "Pending Payment": ["Paid"],
   Paid: ["Ready for Install", "Error"],
   "Ready for Install": ["Configuring", "Error"],
   Configuring: ["Testing", "Error"],
@@ -225,11 +228,15 @@ function ensureEnumValue(value, allowedValues) {
 }
 
 function defaultInstallStatusForOrder(orderLike = {}) {
+  if (orderLike.payment_status !== "paid") {
+    return "Pending Payment";
+  }
+
   if (orderLike.install_initialized_at) {
     return "Ready for Install";
   }
 
-  return orderLike.payment_status === "paid" ? "Paid" : "Paid";
+  return "Paid";
 }
 
 function buildEmptySharedInstallConfiguration() {
@@ -890,6 +897,10 @@ export function mergeInstallConfiguration(currentConfig = {}, patch = {}, items 
 
 export function derivePipelineStatus(orderLike) {
   const defaultStatus = defaultInstallStatusForOrder(orderLike);
+  if (defaultStatus === "Pending Payment") {
+    return defaultStatus;
+  }
+
   const trackedItems = getTrackedInstallItems(normalizeOrderItems(orderLike.items || [], defaultStatus));
   const statuses = trackedItems.map((item) => getTrackedItemStatus(item, defaultStatus));
 
@@ -929,6 +940,10 @@ export function mapPipelineStatusToOrderStatus({
   trackedItems = [],
   paymentStatus = "pending",
 }) {
+  if (paymentStatus !== "paid") {
+    return "pending_payment";
+  }
+
   if (trackedItems.length > 0 && trackedItems.every((item) => item.install_status === "Live")) {
     return "fully_live";
   }
@@ -2064,7 +2079,7 @@ export async function updateTrackedServiceInstallStatus({
     order_status: mapPipelineStatusToOrderStatus({
       pipelineStatus: nextPipelineStatus,
       trackedItems,
-      paymentStatus: order.payment_status || "paid",
+      paymentStatus: order.payment_status,
     }),
     last_install_event_at: now,
   });

@@ -144,6 +144,95 @@ function createPublicRouteClient() {
   };
 }
 
+const ADMIN_GATEWAY_FUNCTION = "adminDataGateway";
+
+function unwrapGatewayResult(response) {
+  const data = response?.data ?? response;
+  if (data && typeof data === "object" && Object.prototype.hasOwnProperty.call(data, "result")) {
+    return data.result;
+  }
+  return data;
+}
+
+function installAdminGatewayProxy(client) {
+  const invoke = client?.functions?.invoke;
+  if (typeof invoke !== "function") return client;
+
+  const invokeGateway = async (payload) => {
+    const response = await invoke.call(client.functions, ADMIN_GATEWAY_FUNCTION, payload);
+    return unwrapGatewayResult(response);
+  };
+
+  const entityCollection = new Proxy(
+    {},
+    {
+      get(_target, entityName) {
+        if (typeof entityName !== "string") return undefined;
+
+        return {
+          list: (sort = "", limit = 50, skip = 0) =>
+            invokeGateway({
+              kind: "entity",
+              entityName,
+              operation: "list",
+              args: { sort, limit, skip },
+            }),
+          filter: (query = {}, sort = "", limit = 50, skip = 0) =>
+            invokeGateway({
+              kind: "entity",
+              entityName,
+              operation: "filter",
+              args: { query, sort, limit, skip },
+            }),
+          get: (id) =>
+            invokeGateway({
+              kind: "entity",
+              entityName,
+              operation: "get",
+              args: { id },
+            }),
+          create: (data) =>
+            invokeGateway({
+              kind: "entity",
+              entityName,
+              operation: "create",
+              args: { data },
+            }),
+          update: (id, data) =>
+            invokeGateway({
+              kind: "entity",
+              entityName,
+              operation: "update",
+              args: { id, data },
+            }),
+          delete: (id) =>
+            invokeGateway({
+              kind: "entity",
+              entityName,
+              operation: "delete",
+              args: { id },
+            }),
+          subscribe: () => () => {},
+        };
+      },
+    }
+  );
+
+  client.admin = {
+    entities: entityCollection,
+    functions: {
+      invoke: (functionName, payload = {}) =>
+        invokeGateway({
+          kind: "function",
+          functionName,
+          payload,
+        }),
+    },
+  };
+
+  return client;
+}
+
 function shouldUsePublicRouteClient() {
   if (typeof window === "undefined") return false;
   return isPublicRoute(window.location.pathname);
@@ -180,18 +269,20 @@ function installOwnerPortalPreviewFallback(client) {
 }
 
 const sdkClient = installOwnerPortalPreviewFallback(
-  isLocalPreview()
-    ? createLocalPreviewClient()
-    : shouldUsePublicRouteClient()
-      ? createPublicRouteClient()
-      : createClient({
-          appId,
-          token,
-          functionsVersion,
-          serverUrl: '',
-          requiresAuth: false,
-          appBaseUrl
-        })
+  installAdminGatewayProxy(
+    isLocalPreview()
+      ? createLocalPreviewClient()
+      : shouldUsePublicRouteClient()
+        ? createPublicRouteClient()
+        : createClient({
+            appId,
+            token,
+            functionsVersion,
+            serverUrl: '',
+            requiresAuth: false,
+            appBaseUrl
+          })
+  )
 );
 
 export const base44 = sdkClient;

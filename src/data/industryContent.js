@@ -30,22 +30,22 @@ function buildTiers(descriptions) {
     starter: {
       count: 2,
       label: 'Starter System',
-      price: '$497/mo',
-      setup: '$797 setup',
+      price: '$99/mo',
+      setup: '$249 setup',
       automations: [allAutomations[0], allAutomations[1]],
     },
     growth: {
       count: 4,
       label: 'Growth System',
-      price: '$997/mo',
-      setup: '$1,297 setup',
+      price: '$249/mo',
+      setup: '$499 setup',
       automations: [allAutomations[0], allAutomations[1], allAutomations[2], allAutomations[3]],
     },
     pro: {
       count: 6,
       label: 'Pro System',
-      price: '$1,997/mo',
-      setup: '$2,497 setup',
+      price: '$499/mo',
+      setup: '$999 setup',
       automations: allAutomations,
     },
   };

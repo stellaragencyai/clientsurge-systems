@@ -19,7 +19,7 @@ export default function SalesPipelineVisual({ onNavigate }) {
       try {
         const counts = {};
         for (const stage of PIPELINE_STAGES) {
-          const result = await base44.asServiceRole.entities.Leads.filter(
+          const result = await base44.admin.entities.Leads.filter(
             { crm_stage: stage.crmStage },
             'id',
             1

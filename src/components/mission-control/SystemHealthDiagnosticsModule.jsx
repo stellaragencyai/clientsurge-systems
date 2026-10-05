@@ -15,12 +15,12 @@ export default function SystemHealthDiagnosticsModule({ onNavigate }) {
     setLoading(true);
     try {
       const [failedJobs, errorEvents, allEvents, allJobs, rules, simResults] = await Promise.all([
-        base44.asServiceRole.entities.AutomationJob.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
-        base44.asServiceRole.entities.CommunicationEvent.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
-        base44.asServiceRole.entities.CommunicationEvent.filter({}, '-created_date', 200).catch(() => []),
-        base44.asServiceRole.entities.AutomationJob.filter({}, '-created_date', 200).catch(() => []),
-        base44.asServiceRole.entities.AutomationRule.filter({}, '-created_date', 100).catch(() => []),
-        base44.asServiceRole.entities.Leads.filter({ import_source: 'simulation' }, '-created_date', 20).catch(() => []),
+        base44.admin.entities.AutomationJob.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
+        base44.admin.entities.CommunicationEvent.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
+        base44.admin.entities.CommunicationEvent.filter({}, '-created_date', 200).catch(() => []),
+        base44.admin.entities.AutomationJob.filter({}, '-created_date', 200).catch(() => []),
+        base44.admin.entities.AutomationRule.filter({}, '-created_date', 100).catch(() => []),
+        base44.admin.entities.Leads.filter({ import_source: 'simulation' }, '-created_date', 20).catch(() => []),
       ]);
 
       const totalEvents = allEvents.length || 1;

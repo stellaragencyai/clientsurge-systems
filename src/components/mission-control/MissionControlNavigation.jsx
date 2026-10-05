@@ -53,9 +53,9 @@ export default function MissionControlNavigation({ activeModule, onNavigate }) {
     const loadCounts = async () => {
       try {
         const [leads, automations, events] = await Promise.all([
-          base44.asServiceRole.entities.Leads.filter({}, 'id', 1),
-          base44.asServiceRole.entities.AutomationRule.filter({}, 'id', 1),
-          base44.asServiceRole.entities.CommunicationEvent.filter({}, 'id', 1),
+          base44.admin.entities.Leads.filter({}, 'id', 1),
+          base44.admin.entities.AutomationRule.filter({}, 'id', 1),
+          base44.admin.entities.CommunicationEvent.filter({}, 'id', 1),
         ]);
         setCounts({
           leads: (leads || []).length,

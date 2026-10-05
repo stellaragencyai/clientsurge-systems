@@ -11,10 +11,10 @@ export default function InstantLeadResponseDebugPanel() {
     setLoading(true);
     try {
       const [jobs, events, deadLetters, websiteLeads] = await Promise.all([
-        base44.asServiceRole.entities.AutomationJob.filter({}, '-created_at', 50).catch(() => []),
-        base44.asServiceRole.entities.CommunicationEvent.filter({}, '-created_date', 100).catch(() => []),
-        base44.asServiceRole.entities.DeadLetterLog.filter({}, '-created_at', 20).catch(() => []),
-        base44.asServiceRole.entities.WebsiteLead.filter({}, '-created_date', 30).catch(() => []),
+        base44.admin.entities.AutomationJob.filter({}, '-created_at', 50).catch(() => []),
+        base44.admin.entities.CommunicationEvent.filter({}, '-created_date', 100).catch(() => []),
+        base44.admin.entities.DeadLetterLog.filter({}, '-created_at', 20).catch(() => []),
+        base44.admin.entities.WebsiteLead.filter({}, '-created_date', 30).catch(() => []),
       ]);
 
       setData({

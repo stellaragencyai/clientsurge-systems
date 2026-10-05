@@ -4,9 +4,9 @@ import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 import CSButton from '@/components/design-system/CSButton';
 
 const TIER_DETAILS = {
-  starter: { price: '$497/mo', setup: '$797 setup', automations: '6 Automations' },
-  growth: { price: '$997/mo', setup: '$1,297 setup', automations: '11 Automations' },
-  pro: { price: '$1,997/mo', setup: '$2,497 setup', automations: '16 Automations' },
+  starter: { price: '$99/mo', setup: '$249 setup', automations: '2 Automations' },
+  growth: { price: '$249/mo', setup: '$499 setup', automations: '4 Automations' },
+  pro: { price: '$499/mo', setup: '$999 setup', automations: '6 Automations' },
 };
 
 /**

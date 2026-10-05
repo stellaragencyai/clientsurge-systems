@@ -9,7 +9,7 @@ export default function LeadsRecentChanges() {
   useEffect(() => {
     const loadChanges = async () => {
       try {
-        const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+        const events = await base44.admin.entities.CommunicationEvent.filter(
           { lead_id: { $exists: true } },
           "-created_date",
           15

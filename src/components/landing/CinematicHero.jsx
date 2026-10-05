@@ -1,4 +1,4 @@
-import { ShoppingCart, Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import { Link } from "react-router-dom";
@@ -32,7 +32,7 @@ export default function CinematicHero() {
   const scrollToSection = (id, eventName) => { trackCTA(eventName, "hero"); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
   return (
-    <section className="cs-hero-shield relative flex items-center justify-center overflow-hidden" style={{ minHeight: "calc(100svh - var(--cs-nav-height))", background: "#ffffff" }} aria-label="ClientSurge AI automation storefront">
+    <section className="cs-hero-shield relative flex items-center justify-center overflow-hidden" style={{ minHeight: "calc(100svh - var(--cs-nav-height))", background: "#ffffff" }} aria-label="ClientSurge AI automation packages">
       <style>{`
         .cs-hero-shield,.cs-hero-shield h1,.cs-hero-shield p,.cs-hero-shield span,.cs-hero-shield div,.cs-hero-shield button{color:#000!important;-webkit-text-fill-color:#000!important}
         .cs-hero-eyebrow{color:#006BB0!important;-webkit-text-fill-color:#006BB0!important;text-shadow:none!important}
@@ -81,7 +81,7 @@ export default function CinematicHero() {
             transition={{ duration: 0.5, delay: 0.08 }}
             style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.25rem, 2.35vw, 2rem)", fontWeight: 800, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "0 0 24px 0", maxWidth: "760px" }}
           >
-            Browse AI Systems. Add to Cart. Check Out.
+            Choose Your AI Lead System. Check Out. We Install It.
           </motion.h1>
 
           <motion.p
@@ -91,8 +91,8 @@ export default function CinematicHero() {
             transition={{ duration: 0.5, delay: 0.18 }}
             style={{ fontFamily: "'Inter', sans-serif", fontSize: "clamp(1rem, 1.9vw, 1.15rem)", lineHeight: 1.7, maxWidth: "560px", margin: "0 auto 20px auto" }}
           >
-            Pick a packaged AI system for missed calls, slow follow-up, booking friction, reviews, and lead reactivation.
-            No demos, no sales calls — just add your system to the cart and check out. We configure, test, and install it for you.
+            Compare packaged AI systems for missed calls, slow follow-up, booking friction, reviews, and lead reactivation.
+            No demos, no sales calls. Choose the package that fits your lead flow, complete checkout, and we configure, test, and install it for you.
           </motion.p>
 
           <motion.div
@@ -118,20 +118,20 @@ export default function CinematicHero() {
               className="cs-btn-primary"
               style={{ width: "100%", maxWidth: "300px", height: "54px", padding: "0 32px" }}
             >
-              <ShoppingCart className="w-4 h-4" /> Browse AI Systems
+              <ArrowRight className="w-4 h-4" /> Compare Packages
             </button>
             <Link
-              to="/store"
-              onClick={() => trackCTA("hero_visit_store", "hero")}
+              to="/product-signup"
+              onClick={() => trackCTA("hero_start_checkout", "hero")}
               className="inline-flex items-center justify-center rounded-full border text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
               style={{ width: "100%", maxWidth: "300px", height: "54px", borderColor: "rgba(0,107,176,0.3)", background: "#ffffff", color: "#0079c1" }}
             >
-              <Zap className="w-4 h-4" /> Visit the Store
+              <Zap className="w-4 h-4" /> Start Checkout
             </Link>
           </motion.div>
 
           <p className="cs-hero-subcopy text-xs font-semibold">
-            No demos required · Add to cart and check out · Done-for-you setup included
+            No demos required · Transparent package pricing · Done-for-you setup included
           </p>
 
           {/* Social proof metrics bar — specific outcomes, not vague claims */}

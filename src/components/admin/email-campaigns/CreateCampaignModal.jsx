@@ -58,6 +58,10 @@ function buildIndustryForm(industryKey, previousForm) {
   };
 }
 
+function getSendConfirmationPhrase(preview) {
+  return preview?.recipient_count ? `SEND ${preview.recipient_count}` : "";
+}
+
 export default function CreateCampaignModal({ onClose, onCreate }) {
   const [form, setForm] = useState({
     name: "",
@@ -74,11 +78,14 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
   const [saving, setSaving] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [previewResult, setPreviewResult] = useState(null);
+  const [sendConfirmation, setSendConfirmation] = useState("");
   const [error, setError] = useState("");
   const [step, setStep] = useState(1);
 
   const selectedIndustry = form.industry_sequence || form.segment_filters?.industries?.[0] || "";
   const maxRecipients = Number(form.max_recipients || form.segment_filters?.max_recipients || 25);
+  const expectedSendConfirmation = getSendConfirmationPhrase(previewResult);
+  const sendConfirmationMatches = sendConfirmation.trim() === expectedSendConfirmation;
 
   const updateSegmentFilters = (filters) => {
     const nextMax = Number(filters.max_recipients || maxRecipients || 25);
@@ -92,6 +99,7 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
   const handleIndustryChange = (industryKey) => {
     setForm(f => buildIndustryForm(industryKey, f));
     setPreviewResult(null);
+    setSendConfirmation("");
     setError("");
   };
 
@@ -121,6 +129,7 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
         preview_only: true,
       });
       setPreviewResult({ ...res.data, campaign_id: campaign.id, campaign });
+      setSendConfirmation("");
       setStep(3);
     } catch (err) {
       setError(err?.response?.data?.error || err?.message || "Preview failed");
@@ -135,7 +144,12 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
       setError("Only a reviewed 25-lead production test can be sent from this screen.");
       return;
     }
-    if (!window.confirm(`Send this ${selectedIndustry} outreach test to ${previewResult.recipient_count} recipients?`)) {
+    if (!previewResult.sending_ready) {
+      setError("This preview is not ready to send. Review the suppression details first.");
+      return;
+    }
+    if (!sendConfirmationMatches) {
+      setError(`Type ${expectedSendConfirmation} exactly before sending.`);
       return;
     }
     setSaving(true);
@@ -290,6 +304,13 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
                 <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">Duplicates: {previewResult.duplicate_excluded_count ?? 0}</div>
                 <div className="rounded-lg border border-border bg-muted/30 px-3 py-2">Recent contact: {previewResult.recently_contacted_count ?? 0}</div>
               </div>
+              {previewResult.suppression_counts && (
+                <div className="rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                  Suppression detail: {Object.entries(previewResult.suppression_counts)
+                    .map(([reason, count]) => `${reason.replace(/_/g, " ")}: ${count}`)
+                    .join(", ")}
+                </div>
+              )}
               {previewResult.sample_recipients?.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-foreground mb-2">Sample Recipients:</p>
@@ -309,6 +330,20 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
               {previewResult.recipient_count === 0 && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
                   No leads match the current safe test filters.
+                </div>
+              )}
+              {previewResult.sending_ready && expectedSendConfirmation && (
+                <div className="space-y-2 rounded-lg border border-border bg-background px-3 py-3">
+                  <label className="block text-xs font-semibold text-foreground">
+                    Type {expectedSendConfirmation} exactly
+                  </label>
+                  <input
+                    type="text"
+                    value={sendConfirmation}
+                    onChange={e => setSendConfirmation(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    autoComplete="off"
+                  />
                 </div>
               )}
             </div>
@@ -365,7 +400,14 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
             {step === 3 && (
               <button
                 onClick={handleSendNow}
-                disabled={saving || !previewResult?.recipient_count || maxRecipients > 25 || previewResult?.recipient_count > 25}
+                disabled={
+                  saving ||
+                  !previewResult?.recipient_count ||
+                  !previewResult?.sending_ready ||
+                  maxRecipients > 25 ||
+                  previewResult?.recipient_count > 25 ||
+                  !sendConfirmationMatches
+                }
                 className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, LayoutGrid, Clock, BadgeCheck, ShoppingCart, ArrowRight } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
-import { AI_PRODUCTS, CATEGORIES, getPackageOffer, getPackageServices } from "@/lib/aiProducts";
+import { AI_PRODUCTS, CATEGORIES, PACKAGE_OFFERS, formatCurrency, getPackageOffer, getPackageServices } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
@@ -80,6 +80,15 @@ function StoreInner() {
   const trackPackageSelection = (packageKey) => {
     trackCTA(`store_package_${packageKey}`, "store");
   };
+
+  const packageLinks = useMemo(() => (
+    PACKAGE_OFFERS.map((offer) => ({
+      name: offer.customer_facing_name || offer.name,
+      key: offer.package_key,
+      price: `${formatCurrency(offer.setup_total)} setup + ${formatCurrency(offer.monthly_total)}/mo`,
+      badge: offer.package_key === "growth_system" ? "Recommended" : "",
+    }))
+  ), []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -160,11 +169,7 @@ function StoreInner() {
             <h2 className="text-xl font-titles font-bold text-foreground mb-2">Want the fastest path? Start with a complete system.</h2>
             <p className="text-sm text-muted-foreground mb-5">Buying automations one by one is useful, but most businesses move faster by starting with Starter, Growth, or Pro.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {[
-                { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo" },
-                { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", badge: "Recommended" },
-                { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo" },
-              ].map((pkg) => (
+              {packageLinks.map((pkg) => (
                 <a
                   key={pkg.key}
                   href={checkoutHrefForPackage(pkg.key)}

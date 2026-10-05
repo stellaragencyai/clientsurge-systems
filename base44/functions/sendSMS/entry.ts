@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { AuthGuardError, requireAdminOrSignedInternalInvocation } from "../_shared/authGuards.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -164,6 +165,9 @@ Deno.serve(async (req) => {
       return json({ error: 'Method not allowed' }, 405);
     }
 
+    const base44 = createClientFromRequest(req);
+    await requireAdminOrSignedInternalInvocation(base44, req);
+
     const { phone, message, leadId } = await req.json();
 
     if (!phone || !message) {
@@ -177,7 +181,6 @@ Deno.serve(async (req) => {
     if (!normalizedPhone) {
       if (leadId) {
         try {
-          const base44 = createClientFromRequest(req);
           await base44.asServiceRole.entities.CommunicationEvent.create({
             lead_id: leadId,
             channel: 'sms',
@@ -201,7 +204,6 @@ Deno.serve(async (req) => {
       return json({ error: 'Twilio credentials not configured' }, 500);
     }
 
-    const base44 = createClientFromRequest(req);
     let fromNumber = null;
     try {
       const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
@@ -398,6 +400,9 @@ Deno.serve(async (req) => {
 
     return json({ success: true, messageSid: data.sid, normalized_phone: normalizedPhone });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return json({ error: error.message, code: error.code }, error.status);
+    }
     return json({ error: error.message }, 500);
   }
 });

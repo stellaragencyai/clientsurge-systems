@@ -31,7 +31,7 @@ export default function MedSpaFinalCTA() {
         </p>
 
         <p className="text-sm text-muted-foreground mb-8">
-          Starting from $497/mo with setup scoped after the audit. Month-to-month after launch.
+          Starting from $99/mo with setup scoped after the audit. Month-to-month after launch.
         </p>
 
         {!showForm ? (

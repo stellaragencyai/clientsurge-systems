@@ -190,13 +190,13 @@ export default function SolutionSection() {
           className="text-center mt-12"
         >
           <CSButton
-            to="/store"
+            to="/pricing"
             variant="primary"
             size="md"
             iconRight={ArrowRight}
             onClick={() => trackCTA('solution_browse_systems', 'solution_section')}
           >
-            Browse AI Systems
+            Compare Packages
           </CSButton>
         </motion.div>
       </div>

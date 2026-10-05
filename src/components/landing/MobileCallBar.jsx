@@ -1,6 +1,5 @@
 import { Phone, CalendarCheck } from "lucide-react";
-import { useMemo, useState } from "react";
-import DemoBookingModal from "../forms/DemoBookingModal";
+import { useMemo } from "react";
 import { trackCTA } from "@/lib/analytics";
 
 const FALLBACK_PHONE = "+16025843227";
@@ -13,7 +12,6 @@ function formatPhoneLabel(phone) {
 }
 
 export default function MobileCallBar() {
-  const [showModal, setShowModal] = useState(false);
   const phoneNumber = FALLBACK_PHONE;
   const phoneLabel = useMemo(() => formatPhoneLabel(phoneNumber), [phoneNumber]);
 
@@ -39,12 +37,10 @@ export default function MobileCallBar() {
           <button
             type="button"
             onClick={() => {
-              trackCTA?.("mobile_call_bar_browse_systems");
-              setShowModal(true);
+              trackCTA?.("mobile_call_bar_compare_packages");
+              window.location.href = "/pricing";
             }}
-            aria-label="Browse AI systems and open the planning modal"
-            aria-haspopup="dialog"
-            aria-expanded={showModal ? "true" : "false"}
+            aria-label="Compare ClientSurge packages"
             className="flex min-w-0 flex-[1.4] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-bold text-white cs-mobile-action"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
@@ -52,11 +48,10 @@ export default function MobileCallBar() {
             }}
           >
             <CalendarCheck className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-            <span>Browse AI Systems</span>
+            <span>Compare Packages</span>
           </button>
         </div>
       </nav>
-      {showModal && <DemoBookingModal isOpen={showModal} onClose={() => setShowModal(false)} />}
     </>
   );
 }

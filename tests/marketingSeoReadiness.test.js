@@ -22,6 +22,14 @@ const INTENDED_PUBLIC_ROUTES = [
   "/pricing",
   "/automations",
   "/contact",
+  "/industries",
+  "/proof",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/blog",
+  "/testimonials",
+  "/roadmap",
   "/privacy",
   "/terms",
   "/sms-terms",
@@ -62,7 +70,7 @@ test("sitemap contains only intended public routes", () => {
   const locMatches = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
   assert.deepEqual(
     locMatches,
-    INTENDED_PUBLIC_ROUTES.map((route) => `https://clientsurgesystems.com${route}`),
+    SITEMAP_STATIC_PATHS.map((route) => `https://clientsurgesystems.com${route}`),
   );
 
   for (const route of PRIVATE_OR_INTERNAL_ROUTES) {
@@ -88,9 +96,9 @@ test("robots blocks private/internal route families and includes sitemap", () =>
 });
 
 test("static fallback is crawlable and does not expose app-builder route directory", () => {
-  assert.match(indexHtml, /Starter System:<\/strong> \$797 setup \+ \$497\/month/);
-  assert.match(indexHtml, /Growth System:<\/strong> \$1,297 setup \+ \$997\/month/);
-  assert.match(indexHtml, /Pro System:<\/strong> \$2,497 setup \+ \$1,997\/month/);
+  assert.match(indexHtml, /Starter System:<\/strong> \$249 setup \+ \$99\/month/);
+  assert.match(indexHtml, /Growth System:<\/strong> \$499 setup \+ \$249\/month/);
+  assert.match(indexHtml, /Pro System:<\/strong> \$999 setup \+ \$499\/month/);
 
   assert.doesNotMatch(indexHtml, />Pages</i);
   assert.doesNotMatch(indexHtml, /Admin Dashboard|Business Setup|Client Portal|Function Audit|System Observability/i);

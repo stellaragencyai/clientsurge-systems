@@ -9,7 +9,7 @@ export const PUBLIC_ROUTE_METADATA = {
     key: "pricing",
     title: "Pricing | Starter, Growth, and Pro AI Automation Packages | ClientSurge Systems",
     description:
-      "Compare ClientSurge Systems packages with clear setup fees, monthly subscription scope, install expectations, and support paths for AI automation services.",
+      "Compare ClientSurge Systems packages with clear one-time fees, monthly subscription scope, install expectations, and support paths for AI automation services.",
   },
   "/automations": {
     key: "automations",
@@ -39,7 +39,7 @@ export const PUBLIC_ROUTE_METADATA = {
     key: "faq",
     title: "FAQ | ClientSurge Systems",
     description:
-      "Answers to common questions about ClientSurge Systems packages, setup, AI automation workflows, billing, support, and implementation.",
+      "Answers to common questions about ClientSurge Systems packages, implementation, AI automation workflows, billing, support, and ongoing service.",
   },
   "/how-it-works": {
     key: "how-it-works",
@@ -93,7 +93,7 @@ export const PUBLIC_ROUTE_METADATA = {
     key: "refund-policy",
     title: "Refund and Cancellation Policy | ClientSurge Systems",
     description:
-      "Read the ClientSurge Systems refund and cancellation policy covering setup work, monthly subscriptions, prospective cancellation, and billing support.",
+      "Read the ClientSurge Systems refund and cancellation policy covering implementation work, monthly subscriptions, prospective cancellation, and billing support.",
   },
 };
 
@@ -151,9 +151,15 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/",
   "/pricing",
   "/automations",
+  "/contact",
   "/industries",
   "/proof",
-  "/contact",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/blog",
+  "/testimonials",
+  "/roadmap",
   "/privacy",
   "/terms",
   "/sms-terms",
@@ -176,28 +182,25 @@ export const APP_SHELL_PUBLIC_UTILITY_PATHS = [
   "/product-sign-up",
   "/product_signup",
   "/signup",
+  "/client-portal",
+  "/client-dashboard",
   "/start",
   "/book",
   "/book-demo",
   "/store",
-  "/faq",
-  "/how-it-works",
-  "/about",
-  "/blog",
-  "/testimonials",
-  "/roadmap",
 ];
 
 // Routes the React shell may render without treating the visitor as an admin.
-// Client/dashboard/setup surfaces are intentionally excluded here because they
-// are authenticated/private surfaces and should never appear in public route
-// directories, sitemap output, or public-safe fallbacks.
+// Client portal entries render only a safe access shell here; setup surfaces are
+// authenticated/private and should never appear in public route directories,
+// sitemap output, or public-safe fallbacks.
 export const APP_SHELL_PUBLIC_PATHS = [
   ...PUBLIC_ROUTE_PATHS,
   ...APP_SHELL_PUBLIC_UTILITY_PATHS,
 ];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
+  "/client",
   "/client-portal",
   "/client-dashboard",
   "/client-saas",
@@ -282,12 +285,6 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/launch-control",
   "/review",
   "/leads/capture",
-  "/faq",
-  "/how-it-works",
-  "/about",
-  "/blog",
-  "/testimonials",
-  "/roadmap",
   ...AUTHENTICATED_ROUTE_PREFIXES,
   ...ADMIN_ROUTE_PREFIXES,
   ...INTERNAL_ROUTE_PREFIXES,
@@ -310,6 +307,8 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/adminsettings",
   "/dashboard",
   "/dashboard/",
+  "/client",
+  "/client/",
   "/client-portal",
   "/client-portal/",
   "/client-dashboard",
@@ -360,4 +359,5 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/delete-account",
   "/data-deletion",
   "/product-signup",
+  "/store",
 ];

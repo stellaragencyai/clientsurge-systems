@@ -6,9 +6,9 @@ Use this checklist after deploying the Track A public cleanup candidate.
 - [ ] `/` loads the real public homepage.
 - [ ] `/` does not show a generated `Pages` directory.
 - [ ] `/pricing` loads pricing.
-- [ ] `/pricing` shows Starter System: $797 setup + $497/month.
-- [ ] `/pricing` shows Growth System: $1,297 setup + $997/month.
-- [ ] `/pricing` shows Pro System: $2,497 setup + $1,997/month.
+- [ ] `/pricing` shows Starter System: $249 setup + $99/month.
+- [ ] `/pricing` shows Growth System: $499 setup + $249/month.
+- [ ] `/pricing` shows Pro System: $999 setup + $499/month.
 - [ ] `/pricing` does not show a generated `Pages` directory.
 - [ ] `/automations` loads without generated route leaks.
 - [ ] `/contact` loads without generated route leaks.

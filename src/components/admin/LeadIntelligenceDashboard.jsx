@@ -85,7 +85,7 @@ export default function LeadIntelligenceDashboard() {
     try {
       const segmentFilter = SEGMENT_CONFIG[activeSegment]?.filter || {};
       const offset = page * PAGE_SIZE;
-      const result = await base44.asServiceRole.entities.Leads.filter(
+      const result = await base44.admin.entities.Leads.filter(
         segmentFilter,
         "-intelligence_score",
         PAGE_SIZE,

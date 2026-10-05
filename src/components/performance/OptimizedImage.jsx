@@ -67,7 +67,7 @@ const OptimizedImage = memo(function OptimizedImage({
       height={height}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
-      fetchpriority={eager ? "high" : "auto"}
+      fetchPriority={eager ? "high" : "auto"}
       onLoad={() => setLoaded(true)}
       className={className}
       style={{

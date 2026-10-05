@@ -21,9 +21,9 @@ export default function SystemHealthIndicator({ compact = false }) {
     try {
       setLoading(true);
       const [failedEvents, deadLetters, alerts] = await Promise.all([
-        base44.asServiceRole.entities.CommunicationEvent.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
-        base44.asServiceRole.entities.DeadLetterLog.list('-created_date', 20).catch(() => []),
-        base44.asServiceRole.entities.Alert.filter({ resolved: false }, '-created_date', 20).catch(() => []),
+        base44.admin.entities.CommunicationEvent.filter({ status: 'failed' }, '-created_date', 50).catch(() => []),
+        base44.admin.entities.DeadLetterLog.list('-created_date', 20).catch(() => []),
+        base44.admin.entities.Alert.filter({ resolved: false }, '-created_date', 20).catch(() => []),
       ]);
 
       const r = [];

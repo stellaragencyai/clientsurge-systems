@@ -56,7 +56,7 @@ export function csLeadReceivedEmail(input: {
     title: `Thanks, ${name}! We've got your info.`,
     subtitle: `Your request has been received and our team will reach out within 1 business day to discuss next steps.`,
     body: bodyParts.join(''),
-    ctaHtml: csPillButton('Browse AI Systems', `${WEBSITE_URL()}/store`),
+    ctaHtml: csPillButton('Compare Packages', `${WEBSITE_URL()}/pricing`),
     footerTitle: 'ClientSurge Systems',
     footerText: `Reply to this email or contact ${SUPPORT_EMAIL()}. ${SUPPORT_PHONE()} · Phoenix, Arizona`,
     logoUrl: input.logoUrl || csEmailLogoUrl(),
@@ -85,7 +85,7 @@ export function csContactConfirmationEmail(input: {
     title: `We got your message, ${name}.`,
     subtitle: `Thanks for reaching out. Our team will review your message and respond shortly.`,
     body: bodyParts.join(''),
-    ctaHtml: csPillButton('Visit Our Store', `${WEBSITE_URL()}/store`),
+    ctaHtml: csPillButton('Compare Packages', `${WEBSITE_URL()}/pricing`),
     footerTitle: 'ClientSurge Systems',
     footerText: `Reply to this email or contact ${SUPPORT_EMAIL()}. ${SUPPORT_PHONE()} · Phoenix, Arizona`,
     logoUrl: input.logoUrl || csEmailLogoUrl(),
@@ -114,7 +114,7 @@ export function csAuditConfirmationEmail(input: {
     title: `Your free audit is queued, ${name}.`,
     subtitle: `We'll review your current setup and send a tailored recommendation within 1 business day.`,
     body: bodyParts.join(''),
-    ctaHtml: csPillButton('Browse AI Systems', `${WEBSITE_URL()}/store`),
+    ctaHtml: csPillButton('Compare Packages', `${WEBSITE_URL()}/pricing`),
     footerTitle: 'ClientSurge Systems',
     footerText: `Reply to this email or contact ${SUPPORT_EMAIL()}. ${SUPPORT_PHONE()} · Phoenix, Arizona`,
     logoUrl: input.logoUrl || csEmailLogoUrl(),
@@ -132,14 +132,14 @@ export function csSignupConfirmationEmail(input: {
 
   const bodyParts: string[] = [];
   bodyParts.push(csInfoCard('Your account', email, { accent: true }));
-  bodyParts.push(csInfoCard('What you can do now', 'Browse our store of packaged AI systems, add systems to your cart, and check out — done-for-you setup included.'));
+  bodyParts.push(csInfoCard('What you can do now', 'Compare packaged AI systems, choose Starter, Growth, or Pro, and check out with done-for-you setup included.'));
 
   return csEmailShell({
     badge: 'Welcome Aboard',
     title: `Welcome to ClientSurge Systems.`,
-    subtitle: `Your account has been created. Browse our AI systems and add them to your cart — no demos required.`,
+    subtitle: `Your account has been created. Compare our AI systems and check out when ready — no demos required.`,
     body: bodyParts.join(''),
-    ctaHtml: csPillButton('Browse the Store', `${WEBSITE_URL()}/store`),
+    ctaHtml: csPillButton('Compare Packages', `${WEBSITE_URL()}/pricing`),
     footerTitle: 'ClientSurge Systems',
     footerText: `Reply to this email or contact ${SUPPORT_EMAIL()}. ${SUPPORT_PHONE()} · Phoenix, Arizona`,
     logoUrl: input.logoUrl || csEmailLogoUrl(),

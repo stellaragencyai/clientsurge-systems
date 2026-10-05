@@ -10,23 +10,24 @@ const checkoutPackages = PACKAGE_OFFERS.filter((offer) => offer.checkout_enabled
 test("product signup derives all package names, prices, and features from the canonical catalog", () => {
   assert.match(signup, /PACKAGE_OFFERS/);
   assert.match(signup, /CHECKOUT_PACKAGES = PACKAGE_OFFERS\.filter/);
-  assert.match(signup, /currentPkg\.setup_total \+ currentPkg\.monthly_total/);
+  assert.match(signup, /currentPkg\.implementation_fee \|\| currentPkg\.setup_total/);
   assert.match(signup, /currentPkg\.included_services/);
 
   assert.deepEqual(
     checkoutPackages.map((offer) => [offer.package_key, offer.setup_total, offer.monthly_total]),
     [
-      ["starter_system", 797, 497],
-      ["growth_system", 1297, 997],
-      ["pro_system", 2497, 1997],
+      ["starter_system", 249, 99],
+      ["growth_system", 499, 249],
+      ["pro_system", 999, 499],
     ],
   );
 });
 
 test("checkout states the exact first payment structure", () => {
   assert.match(signup, /First Stripe payment:/);
-  assert.match(signup, /first payment includes the one-time setup fee and the first month/i);
-  assert.match(signup, /monthly subscription then renews/);
+  assert.match(signup, /one-time setup fee only/i);
+  assert.match(signup, /Monthly subscription then renews/);
+  assert.match(signup, /first charged 30 days after today/i);
 });
 
 test("signup package summaries match the locked six-automation offer", () => {

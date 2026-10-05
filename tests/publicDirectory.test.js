@@ -13,6 +13,14 @@ const EXPECTED_PUBLIC_PAGES = [
   '/pricing',
   '/automations',
   '/contact',
+  '/industries',
+  '/proof',
+  '/faq',
+  '/how-it-works',
+  '/about',
+  '/blog',
+  '/testimonials',
+  '/roadmap',
   '/privacy',
   '/terms',
   '/sms-terms',
@@ -29,9 +37,15 @@ const GENERIC_APP_DIRECTORY_PHRASES = [
 
 test('public directory stays limited to customer-facing pages', () => {
   assert.deepEqual(PUBLIC_DIRECTORY_PAGES, EXPECTED_PUBLIC_PAGES);
-  assert.deepEqual(APP_SHELL_PUBLIC_PATHS, EXPECTED_PUBLIC_PAGES);
   assert.deepEqual(SITEMAP_STATIC_PATHS, EXPECTED_PUBLIC_PAGES);
   assert.deepEqual(BLOG_SITEMAP_PATHS, []);
+  for (const route of EXPECTED_PUBLIC_PAGES) {
+    assert.ok(APP_SHELL_PUBLIC_PATHS.includes(route), `${route} should render in the public app shell`);
+  }
+  for (const route of ['/login', '/product-signup', '/store', '/book']) {
+    assert.equal(PUBLIC_DIRECTORY_PAGES.includes(route), false, `${route} should stay out of public directory output`);
+    assert.ok(APP_SHELL_PUBLIC_PATHS.includes(route), `${route} should remain reachable in the app shell`);
+  }
 });
 
 test('public metadata does not use generic app-directory wording', () => {

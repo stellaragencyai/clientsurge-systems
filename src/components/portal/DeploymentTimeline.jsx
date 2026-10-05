@@ -384,7 +384,7 @@ export default function DeploymentTimeline({
 
   async function fetchProofLogs(dep) {
     try {
-      return await base44.asServiceRole.entities.AutomationProofLog.filter(
+      return await base44.admin.entities.AutomationProofLog.filter(
         { client_deployment_id: dep.id },
         "-tested_at",
         50
@@ -396,7 +396,7 @@ export default function DeploymentTimeline({
 
   async function fetchExecutionLogs(dep) {
     try {
-      return await base44.asServiceRole.entities.AutomationExecutionLog.filter(
+      return await base44.admin.entities.AutomationExecutionLog.filter(
         { client_deployment_id: dep.id },
         "-created_date",
         100
@@ -408,7 +408,7 @@ export default function DeploymentTimeline({
 
   async function fetchAuditLogs(dep) {
     try {
-      return await base44.asServiceRole.entities.AuditLog.filter(
+      return await base44.admin.entities.AuditLog.filter(
         { entity_id: dep.id },
         "-created_date",
         50

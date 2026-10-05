@@ -13,7 +13,7 @@ export const SAAS_AUDIT_CATEGORIES = [
 
 export const SAAS_AUDIT_ITEMS = [
   // Category 1
-  { id: 1, cat: 1, title: "Five-second homepage clarity test", status: "green", note: "Headline: 'Browse AI Systems. Add to Cart. Check Out.' — product-specific, not generic." },
+  { id: 1, cat: 1, title: "Five-second homepage clarity test", status: "green", note: "Headline clearly points visitors to compare packaged AI lead systems and start checkout." },
   { id: 2, cat: 1, title: "Time to first value", status: "green", note: "Product-signup flow is direct; no empty gate between purchase and portal." },
   { id: 3, cat: 1, title: "Empty state experience", status: "green", note: "EmptyState component + EmptyStateDashboard deployed in portal dashboards." },
   { id: 4, cat: 1, title: "Progress indicators in multi-step flows", status: "green", note: "QuickStartInline progress bar, CheckoutStepper, CheckoutProgress all present." },

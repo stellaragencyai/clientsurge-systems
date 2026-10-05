@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@14.21.0';
 
@@ -103,7 +104,7 @@ Deno.serve(async (req) => {
         // Send email via Resend
         const resendKey = Deno.env.get('RESEND_API_KEY');
         if (resendKey) {
-          await fetch('https://api.resend.com/emails', {
+          await resendFetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${resendKey}`,

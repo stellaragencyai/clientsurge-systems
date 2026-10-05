@@ -15,9 +15,9 @@ Primary CTA: Free Automation Audit.
 ## Package Table
 | Package | Internal key | Setup fee | Monthly fee | Included automations | Optional automations | AI voice agent status | Owner confirmation flags |
 |---|---:|---:|---:|---|---|---|---|
-| Starter | `starter_system` | $797 | $497 | Instant Lead Response; Missed Call Text-Back | Nurture, booking, reactivation, review requests | Optional add-on; not included | OWNER_CONFIRMATION_REQUIRED: pricing approval; AI voice packaging |
-| Growth | `growth_system` | $1,297 | $997 | Instant Lead Response; Missed Call Text-Back; 14-Day Nurture Sequence; AI Booking Agent | Reactivation, review requests | Optional add-on; not included | OWNER_CONFIRMATION_REQUIRED: pricing approval; AI voice packaging |
-| Pro | `pro_system` | $2,497 | $1,997 | Instant Lead Response; Missed Call Text-Back; 14-Day Nurture Sequence; AI Booking Agent; Lead Reactivation; Review Request Automation | AI voice reception if approved | Optional add-on; not included | OWNER_CONFIRMATION_REQUIRED: pricing approval; AI voice packaging |
+| Starter | `starter_system` | $249 | $99 | Instant Lead Response; Missed Call Text-Back | Nurture, booking, reactivation, review requests | Optional add-on; not included | OWNER_CONFIRMATION_REQUIRED: AI voice packaging |
+| Growth | `growth_system` | $499 | $249 | Instant Lead Response; Missed Call Text-Back; 14-Day Nurture Sequence; AI Booking Agent | Reactivation, review requests | Optional add-on; not included | OWNER_CONFIRMATION_REQUIRED: AI voice packaging |
+| Pro | `pro_system` | $999 | $499 | Instant Lead Response; Missed Call Text-Back; 14-Day Nurture Sequence; AI Booking Agent; Lead Reactivation; Review Request Automation | AI voice reception if approved | Optional add-on; not included | OWNER_CONFIRMATION_REQUIRED: AI voice packaging |
 
 Legacy alias: `elite_system` maps to `pro_system` for backward compatibility only. Elite should not appear as the current public package name.
 

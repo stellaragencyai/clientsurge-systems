@@ -21,8 +21,8 @@ export default function GrowthOptimizationDashboard() {
     setLoading(true);
     try {
       const [signalsRes, actionsRes] = await Promise.all([
-        base44.asServiceRole.entities.GrowthOptimizationSignal.filter({}, '-triggered_at', 100),
-        base44.asServiceRole.entities.OptimizationAction.filter({}, '-created_at', 50),
+        base44.admin.entities.GrowthOptimizationSignal.filter({}, '-triggered_at', 100),
+        base44.admin.entities.OptimizationAction.filter({}, '-created_at', 50),
       ]);
       setSignals(signalsRes || []);
       setActions(actionsRes || []);

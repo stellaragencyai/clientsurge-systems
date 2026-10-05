@@ -6,7 +6,25 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { stripeFetch } from "../_shared/providerFetch.js";
+import { createSystemAuditLog } from "../_shared/billingAudit.js";
 import { getStripeSecretKey, safeStripeError, StripeConfigurationError } from "../_shared/stripeInit.js";
+import { AuthGuardError, requireOwnerOrAdmin } from "../_shared/authGuards.js";
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function userOwnsOrder(user, order = {}) {
+  const userEmail = normalizeEmail(user?.email);
+  const userClientId = user?.client_id || user?.data?.client_id || user?.metadata?.client_id;
+  const userClientProjectId = user?.client_project_id || user?.data?.client_project_id || user?.metadata?.client_project_id;
+
+  return Boolean(
+    (userEmail && [order.customer_email, order.client_email].map(normalizeEmail).includes(userEmail)) ||
+    (userClientId && order.client_id === userClientId) ||
+    (userClientProjectId && order.client_project_id === userClientProjectId)
+  );
+}
 
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
@@ -17,6 +35,20 @@ Deno.serve(async (req) => {
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
+
+    await requireOwnerOrAdmin(base44, (user) => userOwnsOrder(user, order), {
+      message: "Order access required",
+      code: "order_access_required",
+    });
+
+    if (order.billing_status === "cancelling" || order.cancellation_requested_at) {
+      return secureJson({
+        success: true,
+        duplicate: true,
+        order_id,
+        cancellation_requested_at: order.cancellation_requested_at || null,
+      });
+    }
 
     let stripeCancelled = false;
 
@@ -49,16 +81,61 @@ Deno.serve(async (req) => {
             body: "cancel_at_period_end=true",
           }
         );
-        const stripeData = await stripeRes.json();
+        if (!stripeRes.ok) {
+          const stripeErrorText = await stripeRes.text().catch(() => "");
+          console.error("[cancelSubscription] Stripe cancellation request failed", {
+            requestId,
+            order_id,
+            status: stripeRes.status,
+            stripe_error_present: Boolean(stripeErrorText),
+          });
+          return secureJson(
+            {
+              error: "Unable to schedule cancellation with Stripe. Please contact support.",
+              code: "stripe_cancellation_failed",
+              request_id: requestId,
+            },
+            { status: 502 }
+          );
+        }
+
+        const stripeData = await stripeRes.json().catch(() => ({}));
         stripeCancelled = stripeData?.cancel_at_period_end === true;
+        if (!stripeCancelled) {
+          console.error("[cancelSubscription] Stripe did not confirm cancel_at_period_end", {
+            requestId,
+            order_id,
+          });
+          return secureJson(
+            {
+              error: "Unable to confirm cancellation with Stripe. Please contact support.",
+              code: "stripe_cancellation_not_confirmed",
+              request_id: requestId,
+            },
+            { status: 502 }
+          );
+        }
       }
     }
 
     // Update order
-    await base44.asServiceRole.entities.Order.update(order_id, {
+    const updatedOrder = await base44.asServiceRole.entities.Order.update(order_id, {
       billing_status: "cancelling",
       cancellation_requested_at: new Date().toISOString(),
       cancellation_reason: reason || "client_request",
+    });
+    await createSystemAuditLog(base44, {
+      action: "subscription_cancellation_requested",
+      entityName: "Order",
+      recordId: updatedOrder.id,
+      before: order,
+      after: updatedOrder,
+      source: "cancelSubscription",
+      provider: "stripe",
+      notes: {
+        stripe_subscription_id: order.stripe_subscription_id || "",
+        cancel_at_period_end: stripeCancelled,
+      },
     });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -102,6 +179,13 @@ Stripe cancel_at_period_end: ${stripeCancelled}`,
 
     return secureJson({ success: true, order_id, cancel_at_period_end: stripeCancelled });
   } catch (err: any) {
+    if (err instanceof AuthGuardError) {
+      return secureJson(
+        { error: err.message, code: err.code, request_id: requestId },
+        { status: err.status }
+      );
+    }
+
     const safeError = safeStripeError(err, "Unable to cancel the subscription. Please contact support.");
     console.error("[cancelSubscription] error", {
       requestId,

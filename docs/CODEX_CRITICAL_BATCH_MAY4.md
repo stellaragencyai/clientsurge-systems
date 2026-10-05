@@ -8,7 +8,7 @@
 
 Before touching any file, read and report:
 1. `src/pages/Pricing.jsx` — find ALL Stripe payment links. List each one and whether it starts with `buy.stripe.com/test_` or `buy.stripe.com/` (live)
-2. `src/lib/salesCatalog.js` — list every price value found (monthly + setup). Report any that are NOT: Starter $497/$797, Growth $997/$1297, Elite $1997/$2497, or valid à la carte prices
+2. `src/lib/salesCatalog.js` — list every price value found (monthly + setup). Report any that are NOT: Starter $99/$249, Growth $249/$499, Pro $499/$999, or valid à la carte prices
 3. `base44/functions/stripePaymentWebhook/entry.ts` — find the `checkout.session.completed` handler. Does it check `stripe_event_id` for idempotency before processing? Does it verify the webhook signature?
 4. `base44/functions/stripeWebhookOrders/entry.ts` — same questions: signature check? idempotency check?
 5. `base44/functions/createCheckoutSession/entry.ts` — does it check if `STRIPE_SECRET_KEY` starts with `sk_live_`?
@@ -18,21 +18,21 @@ Report all findings before making any changes.
 
 ---
 
-## TASK #301 — Replace test Stripe links with live links
+## TASK #301 — Replace test Stripe links with live checkout session creation
 
-**File:** `src/pages/Pricing.jsx` (and any other file with `buy.stripe.com/test_`)
+**File:** `src/pages/Pricing.jsx` (and any other file with `buy.stripe.com/test_` or direct `buy.stripe.com/` links)
 
-Replace ALL test payment links with the live ones:
+Replace ALL direct test payment links with the backend `createCheckoutSession` flow. The canonical live Stripe IDs are:
 
-| Tier | Live Link |
-|------|-----------|
-| Starter ($497/mo + $797 setup) | https://buy.stripe.com/14AcN40P5eKu8qz3N5bII00 |
-| Growth ($997/mo + $1,297 setup) | https://buy.stripe.com/eVq6oGbtJeKu6ir6ZhbII01 |
-| Elite ($1,997/mo + $2,497 setup) | https://buy.stripe.com/14A4gyeFVdGq0Y7fvNbII02 |
+| Tier | Setup price ID | Monthly price ID |
+|------|----------------|------------------|
+| Starter ($99/mo + $249 setup) | `price_1TyJ0sBVGjsISdG0WTYUzr4U` | `price_1TyJ0zBVGjsISdG05Nwwf4CR` |
+| Growth ($249/mo + $499 setup) | `price_1TyJ15BVGjsISdG0kwqh9Pkk` | `price_1TyJ1CBVGjsISdG06Qlx3730` |
+| Pro ($499/mo + $999 setup) | `price_1TyJ1IBVGjsISdG00IO5OwMd` | `price_1TyJ1PBVGjsISdG0e9F1BvaO` |
 
 Also check `src/components/store/` and `src/components/landing/Pricing.jsx` for any test links.
 
-After replacing, do a global search for `buy.stripe.com/test_` — if any remain, replace them or flag them.
+After replacing, do a global search for `buy.stripe.com/test_` and `buy.stripe.com/` — if any remain, replace them or flag them.
 
 ---
 
@@ -44,9 +44,9 @@ Enforce these as the ONLY canonical prices in the entire file:
 
 | Tier | Monthly | Setup |
 |------|---------|-------|
-| Starter | $497 | $797 |
-| Growth | $997 | $1,297 |
-| Elite | $1,997 | $2,497 |
+| Starter | $99 | $249 |
+| Growth | $249 | $499 |
+| Pro | $499 | $999 |
 
 À la carte prices (these are also canonical — do not change):
 - Instant Lead Response: $197/mo
@@ -57,7 +57,7 @@ Enforce these as the ONLY canonical prices in the entire file:
 - AI Receptionist: $497/mo
 
 Rules:
-- Remove or fix ANY price that doesn't match the above (especially $97, $297 for tiers, $1997 without comma)
+- Remove or fix ANY tier price that doesn't match the above (especially $97, $297 for tiers, $1997 without comma)
 - Add a comment at the top: `// CANONICAL PRICES — DO NOT EDIT WITHOUT NOLAN APPROVAL`
 - After fixing salesCatalog.js, search all JSX files for hardcoded price strings that contradict these values. Fix or flag each one.
 

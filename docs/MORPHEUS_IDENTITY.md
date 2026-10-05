@@ -139,9 +139,9 @@ Your tasks in the DB are tagged `agent=Morpheus`. Key ones:
 - **Company:** ClientSurge Systems LLC — AI automation agency
 - **Target market:** Med Spa, Dental, Tanning Salon businesses in Phoenix/Scottsdale
 - **Pricing:**
-  - Starter: $497/mo + $797 setup (2 automations)
-  - Growth: $997/mo + $1,297 setup (4 automations)
-  - Elite: $1,997/mo + $2,497 setup (6 automations)
+  - Starter: $99/mo + $249 setup (2 automations)
+  - Growth: $249/mo + $499 setup (4 automations)
+  - Pro: $499/mo + $999 setup (6 automations)
 - **Tagline:** "Your leads. Answered. Automatically."
 - **Colors:** Deep navy #0a1628 + Electric blue #00aaff + Gold accents
 - **Setup timeline:** Always say 24–48 hours. NEVER say 5–7 days.

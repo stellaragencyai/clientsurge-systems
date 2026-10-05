@@ -24,7 +24,7 @@ export default function HomeHero() {
 
   const primaryClick = () => {
     trackCTA('hero_get_my_lead_system', 'hero');
-    window.location.href = '/store';
+    window.location.href = '/pricing';
   };
   const secondaryClick = () => {
     trackCTA('hero_see_how_it_works', 'hero');

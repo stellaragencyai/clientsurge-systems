@@ -229,16 +229,18 @@ Deno.serve(async (req) => {
           leadPatch.next_followup_at = null;
         }
         if (eventType === "email.complained" || eventType === "email.unsubscribed") {
-          leadPatch.email_unsubscribed = true;
-          leadPatch.email_unsubscribed_at = now;
-          leadPatch.do_not_contact = true;
-          leadPatch.do_not_contact_at = now;
-          leadPatch.do_not_contact_reason = eventType === "email.complained"
-            ? "Email spam complaint"
-            : "Provider unsubscribe event";
-          leadPatch.outreach_status = "unsubscribed";
-          leadPatch.next_follow_up_at = null;
-          leadPatch.next_followup_at = null;
+          Object.assign(leadPatch, {
+            email_unsubscribed: true,
+            email_unsubscribed_at: now,
+            do_not_contact: true,
+            do_not_contact_at: now,
+            do_not_contact_reason: eventType === "email.complained"
+              ? "Email spam complaint"
+              : "Provider unsubscribe event",
+            outreach_status: "unsubscribed",
+            next_follow_up_at: null,
+            next_followup_at: null,
+          });
         }
         await base44.asServiceRole.entities.Leads.update(recipient.lead_id, leadPatch).catch(() => null);
       }

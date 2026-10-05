@@ -110,7 +110,7 @@ const SYSTEMS = [
     impact: "0 leads lost",
     impactSub: "to the gap",
     cta: "View Lead Capture System",
-    href: "/store",
+    href: "/pricing?focus=lead-capture",
     accentColor: "#00AEEF",
   },
   {
@@ -120,7 +120,7 @@ const SYSTEMS = [
     impact: "< 60 sec",
     impactSub: "response time",
     cta: "View Missed-Call System",
-    href: "/store",
+    href: "/pricing?focus=missed-call",
     accentColor: "#00AEEF",
   },
   {
@@ -130,7 +130,7 @@ const SYSTEMS = [
     impact: "5–12x",
     impactSub: "more replies",
     cta: "View Follow-Up System",
-    href: "/store",
+    href: "/pricing?focus=ai-follow-up",
     accentColor: "#00AEEF",
   },
   {
@@ -140,7 +140,7 @@ const SYSTEMS = [
     impact: "+40%",
     impactSub: "show-up rate",
     cta: "View Booking System",
-    href: "/store",
+    href: "/pricing?focus=booking",
     accentColor: "#00AEEF",
   },
   {
@@ -150,7 +150,7 @@ const SYSTEMS = [
     impact: "3–5★",
     impactSub: "avg. rating lift",
     cta: "View Review System",
-    href: "/store",
+    href: "/pricing?focus=reviews",
     accentColor: "#D4AF37",
   },
   {
@@ -160,7 +160,7 @@ const SYSTEMS = [
     impact: "Recover $$$",
     impactSub: "already paid for",
     cta: "View Reactivation System",
-    href: "/store",
+    href: "/pricing?focus=reactivation",
     accentColor: "#D4AF37",
   },
 ];
@@ -301,7 +301,7 @@ export default function AutomationSystemsGrid() {
 
           <div className="text-center mt-10">
             <button
-              onClick={() => { trackCTA("browse_all_systems", "automation_systems_grid"); navigate("/store"); }}
+              onClick={() => { trackCTA("browse_all_systems", "automation_systems_grid"); navigate("/pricing"); }}
               className="cs-btn-primary inline-flex items-center gap-2"
             >
               Browse All Automation Systems <ArrowRight className="w-4 h-4" />

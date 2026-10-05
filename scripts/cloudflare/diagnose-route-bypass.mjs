@@ -10,6 +10,8 @@ export const DEFAULT_WORKER_SCRIPT =
   process.env.CLIENTSURGE_CLOUDFLARE_WORKER || "clientsurge-security-edge";
 export const DEFAULT_ACCOUNT_EMAIL =
   process.env.CLIENTSURGE_CLOUDFLARE_ACCOUNT_EMAIL || "nolanfstrommer@gmail.com";
+export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
+export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 
 const DEFAULT_WRANGLER_CONFIG = join(
   process.env.APPDATA || "",
@@ -303,7 +305,42 @@ function buildManagementPlaneAnalysis({
   };
 }
 
-function buildNextAction({ routeSummary, routesProbe, dnsProbe, customHostnamesProbe, rulesetsProbe, analysis }) {
+async function probeLiveEdgeHealth({ zoneName = DEFAULT_ZONE_NAME, fetchImpl = globalThis.fetch } = {}) {
+  const target = `https://${zoneName}${EDGE_HEALTH_PATH}`;
+  try {
+    const response = await fetchImpl(target, { redirect: "manual" });
+    const workerHeader = response.headers.get(EDGE_HEALTH_HEADER);
+    const transformHeader = response.headers.get("x-clientsurge-security-transform");
+    const contentType = response.headers.get("content-type") || "";
+    const body = contentType.includes("application/json")
+      ? await response.clone().json().catch(() => null)
+      : null;
+
+    return {
+      name: "live-edge-health",
+      ok: response.status === 200 && workerHeader === "active",
+      target,
+      status: response.status,
+      worker_header: workerHeader,
+      transform_header: transformHeader,
+      body_ok: body?.ok === true,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      name: "live-edge-health",
+      ok: false,
+      target,
+      status: null,
+      worker_header: null,
+      transform_header: null,
+      body_ok: false,
+      error: safeError(error),
+    };
+  }
+}
+
+function buildNextAction({ routeSummary, routesProbe, dnsProbe, customHostnamesProbe, rulesetsProbe, analysis, liveEdgeProbe }) {
   if (!routesProbe.ok) {
     return {
       status: "needs_cloudflare_worker_route_access",
@@ -327,6 +364,29 @@ function buildNextAction({ routeSummary, routesProbe, dnsProbe, customHostnamesP
   const denied = [dnsProbe, customHostnamesProbe, rulesetsProbe].filter(
     (item) => !item.ok && (item.error?.code === 10000 || item.error?.status === 403)
   );
+
+  if (liveEdgeProbe?.ok) {
+    const deniedNames = denied.map((item) => item.name);
+    const readable = [dnsProbe, customHostnamesProbe, rulesetsProbe]
+      .filter((item) => item.ok)
+      .map((item) => item.name);
+    return {
+      status: denied.length > 0
+        ? "live_worker_verified_management_limited"
+        : "live_worker_verified",
+      message: denied.length > 0
+        ? `Live production traffic returns the Worker health header, but available tokens still cannot inspect ${deniedNames.join(", ")}.`
+        : "Live production traffic returns the Worker health header and the Worker routes point at the expected script.",
+      denied_probes: deniedNames,
+      readable_probes: readable,
+      live_edge_status: liveEdgeProbe.status,
+      live_worker_header: liveEdgeProbe.worker_header,
+      dashboard_path: denied.length > 0
+        ? "Cloudflare Dashboard -> clientsurgesystems.com -> DNS -> Records, Custom Hostnames for SaaS, and Rules/Redirect Rules."
+        : undefined,
+    };
+  }
+
   if (denied.length > 0) {
     const deniedNames = denied.map((item) => item.name);
     const readable = [dnsProbe, customHostnamesProbe, rulesetsProbe]
@@ -449,6 +509,7 @@ export async function diagnoseRouteBypass({
     apiAuths,
     fetchImpl
   );
+  const liveEdgeProbe = await probeLiveEdgeHealth({ zoneName, fetchImpl });
 
   const routes = routesProbe.result?.result || [];
   const routeSummary = routesProbe.ok ? summarizeRoutes(routes, { zoneName, workerScript }) : [];
@@ -465,10 +526,16 @@ export async function diagnoseRouteBypass({
     customHostnamesProbe,
     rulesetsProbe,
     analysis,
+    liveEdgeProbe,
   });
 
   return {
-    ok: ["inspect_bypass_candidates", "management_plane_access_available"].includes(nextAction.status),
+    ok: [
+      "inspect_bypass_candidates",
+      "management_plane_access_available",
+      "live_worker_verified",
+      "live_worker_verified_management_limited",
+    ].includes(nextAction.status),
     checked_at: new Date().toISOString(),
     zone_name: zoneName,
     zone_id: zone.id,
@@ -526,6 +593,7 @@ export async function diagnoseRouteBypass({
         attempted_sources: rulesetsProbe.attempted_sources || [],
         error: rulesetsProbe.error,
       },
+      live_edge_health: liveEdgeProbe,
     },
     next_action: nextAction,
   };
@@ -555,9 +623,21 @@ export function formatRouteBypassDiagnosis(report) {
   if (report.probes) {
     lines.push("Management-plane probes:");
     for (const [label, probeResult] of Object.entries(report.probes)) {
+      if (label === "live_edge_health") continue;
       const status = probeResult.ok ? `ok count=${probeResult.count}` : `denied ${probeResult.error?.message || ""}`;
       lines.push(`- ${label}: ${status}`);
     }
+    lines.push("");
+  }
+
+  if (report.probes?.live_edge_health) {
+    const live = report.probes.live_edge_health;
+    lines.push("Live edge probe:");
+    lines.push(
+      `- ${live.target}: status=${live.status || "unknown"} ${EDGE_HEALTH_HEADER}=${live.worker_header || "missing"}${
+        live.ok ? " (ok)" : " (needs attention)"
+      }`
+    );
     lines.push("");
   }
 

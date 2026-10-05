@@ -25,7 +25,7 @@ export async function adminActionWithAudit(entityName, action, entityId, changes
 
     // Create audit log record
     try {
-      await base44.asServiceRole.entities.AuditLog.create({
+      await base44.admin.entities.AuditLog.create({
         entity_name: entityName,
         entity_id: entityId || result?.id,
         action: action,
@@ -42,7 +42,7 @@ export async function adminActionWithAudit(entityName, action, entityId, changes
   } catch (error) {
     // Log failed action attempt
     try {
-      await base44.asServiceRole.entities.AuditLog.create({
+      await base44.admin.entities.AuditLog.create({
         entity_name: entityName,
         entity_id: entityId,
         action: `${action}_failed`,

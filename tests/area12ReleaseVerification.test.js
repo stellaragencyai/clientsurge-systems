@@ -16,6 +16,7 @@ test("Area 12 release gate persists a commit-specific proof artifact", () => {
   assert.match(releaseGate, /RELEASE_GATE_PROOF_PATH: tmp\/release-gate-proof\.json/);
   assert.match(releaseGate, /Write release gate proof artifact/);
   assert.match(releaseGate, /clientsurge-release-gate-proof-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}/);
+  assert.match(releaseGate, /clientsurge-cloudflare-route-diagnosis-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}/);
   assert.match(releaseGate, /actions\/upload-artifact@v4/);
   assert.match(releaseGate, /downstream_workflow: 'Base44 Auto Publish'/);
   assert.match(releaseGate, /GITHUB_SHA/);
@@ -49,6 +50,10 @@ test("Area 12 release chain still blocks publish behind build and route checks",
   assert.match(releaseGate, /npm run build/);
   assert.match(releaseGate, /npm run test:release-gate:node/);
   assert.match(releaseGate, /node scripts\/product-signup-route-smoke\.mjs/);
+  assert.match(releaseGate, /npm run cloudflare:security:dry-run/);
+  assert.match(releaseGate, /npm run cloudflare:security:diagnose-route -- --json/);
+  assert.match(releaseGate, /cloudflare_route_diagnosis/);
+  assert.match(releaseGate, /launch policy still requires production-security verification to pass/);
   assert.match(base44AutoPublish, /npm run build/);
   assert.match(base44AutoPublish, /Verify live product signup route/);
   assert.match(base44AutoPublish, /Verify live checkout function creates Stripe session/);

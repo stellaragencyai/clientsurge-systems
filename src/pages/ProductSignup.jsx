@@ -283,10 +283,11 @@ export default function ProductSignup() {
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Due Today</p>
               <div className="flex justify-between text-xs text-gray-700"><span>Professional AI Implementation (one-time)</span><span>{implementationLabel}</span></div>
               <div className="flex justify-between text-sm font-bold text-gray-900 pt-1"><span>Total due today</span><span>{dueTodayLabel}</span></div>
+              <p className="text-xs text-gray-700">First Stripe payment: {dueTodayLabel} today for the one-time setup fee only.</p>
             </div>
             <div className="mt-3 rounded-lg bg-white/60 border border-blue-100 p-3">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Recurring</p>
-              <p className="mt-1 text-xs text-gray-700">Monthly subscription of <strong>{monthlyLabel}/month</strong> is first charged 30 days after today’s setup-fee payment and renews monthly until cancelled under the service terms.</p>
+              <p className="mt-1 text-xs text-gray-700">Monthly subscription then renews at <strong>{monthlyLabel}/month</strong>, first charged 30 days after today’s setup-fee payment and renewing monthly until cancelled under the service terms.</p>
             </div>
 
             <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">

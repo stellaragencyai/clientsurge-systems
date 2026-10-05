@@ -2,6 +2,7 @@
 <html lang="en" class="no-js">
   <head>
     <meta charset="UTF-8" />
+    <script src="/clientsurge-public-route-exposure-guard.js"></script>
     <script>
       document.documentElement.classList.remove("no-js");
       document.documentElement.classList.add("js");
@@ -183,9 +184,9 @@
               <h2>Starter, Growth, and Pro</h2>
               <p>Clear AI automation packages for local service businesses that need faster lead response and better follow-up.</p>
               <ul class="static-pricing-list">
-                <li><strong>Starter System:</strong> $797 setup + $497/month.</li>
-                <li><strong>Growth System:</strong> $1,297 setup + $997/month.</li>
-                <li><strong>Pro System:</strong> $2,497 setup + $1,997/month.</li>
+                <li><strong>Starter System:</strong> $249 setup + $99/month.</li>
+                <li><strong>Growth System:</strong> $499 setup + $249/month.</li>
+                <li><strong>Pro System:</strong> $999 setup + $499/month.</li>
               </ul>
             </aside>
           </section>
@@ -208,7 +209,7 @@
       // layer injected a generated page directory into #root (route lists,
       // entity-count boilerplate, "available pages", admin/client/setup
       // links), strip it now and restore the safe static fallback so the
-      // visitor never sees internal route names in the initial paint.
+      // visitor never sees private route names in the initial paint.
       (function () {
         var root = document.getElementById("root");
         if (!root) return;

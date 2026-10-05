@@ -17,7 +17,7 @@ export default function LaunchGatesModule() {
   useEffect(() => {
     const loadGates = async () => {
       try {
-        const result = await base44.asServiceRole.entities.LaunchGate.filter({}, '-created_date', 20);
+        const result = await base44.admin.entities.LaunchGate.filter({}, '-created_date', 20);
         setGates(result || []);
       } catch (e) {
         console.error('Failed to load launch gates:', e);

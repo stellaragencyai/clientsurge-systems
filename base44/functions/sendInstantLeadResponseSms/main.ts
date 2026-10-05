@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { getWebsiteLeadOutboundSuppression, logSuppressedWebsiteLeadOutbound } from "../_shared/outboundLeadGuards.js";
 
@@ -101,7 +102,7 @@ async function sendResendEmail(base44, leadId, toEmail, firstName, businessName)
   const body = `Hi ${firstName},\n\nWe received your request and will be reaching out shortly.\n\nIf this is urgent, feel free to reply to this email or text us back.\n\n– ${businessName}`;
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${resendKey}`,

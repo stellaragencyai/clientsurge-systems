@@ -90,13 +90,13 @@ export default function RevenueLeakSection() {
 
         <div className="text-center mt-10">
           <CSButton
-            to="/store"
+            to="/pricing"
             variant="primary"
             size="md"
             icon={ShoppingCart}
             onClick={() => trackCTA("revenue_leak_browse_store", "revenue_leak")}
           >
-            Browse AI Systems to Fix This
+            Compare Packages to Fix This
           </CSButton>
         </div>
       </div>

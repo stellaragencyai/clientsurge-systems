@@ -9,7 +9,7 @@ import { setPageMetadata } from "@/lib/seo";
 export default function About() {
   useEffect(() => {
     return setPageMetadata({
-      title: "About ClientSurge Systems | AI Automation Storefront for Service Businesses",
+      title: "About ClientSurge Systems | AI Automation Packages for Service Businesses",
       description:
         "Learn why ClientSurge Systems exists: to make buying and launching proven AI systems for lead response, follow-up, booking, reviews, and reactivation simple for service businesses.",
       canonicalPath: "/about",
@@ -86,7 +86,7 @@ export default function About() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link to="/pricing" className="cs-btn-primary">Compare Packages</Link>
-              <Link to="/store" className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors">Browse Automation Store</Link>
+              <Link to="/pricing" className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors">View Pricing</Link>
             </div>
           </div>
         </div>

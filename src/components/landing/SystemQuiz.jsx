@@ -279,7 +279,7 @@ export default function SystemQuiz({ onClose, onBookDemo }) {
       } catch {}
     }
     onClose();
-    navigate("/store");
+    navigate("/pricing");
   };
 
   const handleBookDemo = () => {
