@@ -27,7 +27,7 @@ test("Cloudflare edge keeps public pages on the Base44 app host", () => {
   const originRequest = originRequestFor(new Request("https://clientsurgesystems.com/store?plan=starter"));
   const originUrl = new URL(originRequest.url);
 
-  assert.equal(originUrl.hostname, "grinning-apex-flow-growth.base44.app");
+  assert.equal(originUrl.hostname, "client-surge-systems-copy-ff10df8d.base44.app");
   assert.equal(originUrl.pathname, "/store");
   assert.equal(originUrl.search, "?plan=starter");
 });

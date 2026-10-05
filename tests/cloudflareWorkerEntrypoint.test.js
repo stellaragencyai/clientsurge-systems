@@ -21,3 +21,8 @@ test("Cloudflare deploy entrypoint uses the Telegram tracker wrapper", () => {
     /main\s*=\s*"cloudflare\/clientsurge-production-safe-entry\.mjs"/,
   );
 });
+
+test("Cloudflare deploy config binds the Worker as the production custom domain", () => {
+  assert.match(wranglerConfig, /pattern\s*=\s*"clientsurgesystems\.com"\s*\ncustom_domain\s*=\s*true/);
+  assert.match(wranglerConfig, /pattern\s*=\s*"www\.clientsurgesystems\.com"\s*\ncustom_domain\s*=\s*true/);
+});

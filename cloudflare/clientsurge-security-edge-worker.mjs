@@ -9,8 +9,15 @@ import {
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
 const ALTERNATE_HOST = "www.clientsurgesystems.com";
-const BASE44_ORIGIN_HOST = "grinning-apex-flow-growth.base44.app";
+const PRELAUNCH_BASE44_APP_ID = "6a80ea3e612e6052ff10df8d";
+const PRELAUNCH_BASE44_ORIGIN_HOST = "client-surge-systems-copy-ff10df8d.base44.app";
+const BASE44_ORIGIN_HOST = PRELAUNCH_BASE44_ORIGIN_HOST;
 const BASE44_API_ORIGIN_HOST = "base44.app";
+export const WAITLIST_BASE44_APP_ID = PRELAUNCH_BASE44_APP_ID;
+export const PRELAUNCH_WAITLIST_ORIGIN_HEADER = "x-clientsurge-prelaunch-waitlist-origin";
+export const WAITLIST_SUBSCRIBE_HEADER = "x-clientsurge-waitlist-subscribe";
+export const WAITLIST_PROFILE_HEADER = "x-clientsurge-waitlist-profile";
+export const WAITLIST_EDGE_VERSION = "2026-08-16-prelaunch-waitlist-v1";
 export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
 export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 export const TRUST_SECURITY_SCRIPT_PATH = "/.well-known/clientsurge-trust-security.js";
@@ -1443,6 +1450,16 @@ export function isAnonymousSessionRecordingRequest(request, url = new URL(reques
   return !request.headers.get("authorization") && !request.headers.get("cookie");
 }
 
+export function isWaitlistSubscribeRequest(request, url = new URL(request.url)) {
+  if (request.method !== "POST" && request.method !== "OPTIONS") return false;
+  return url.pathname === `/api/apps/${WAITLIST_BASE44_APP_ID}/functions/subscribe`;
+}
+
+export function isWaitlistProfileRequest(request, url = new URL(request.url)) {
+  if (request.method !== "POST" && request.method !== "OPTIONS") return false;
+  return url.pathname === `/api/apps/${WAITLIST_BASE44_APP_ID}/functions/updateSubscriberProfile`;
+}
+
 function anonymousUserMeResponse() {
   const headers = applySecurityHeaders(new Headers({
     "Content-Type": "application/json; charset=utf-8",
@@ -1465,12 +1482,360 @@ function anonymousSessionRecordingResponse() {
   return new Response(null, { status: 204, headers });
 }
 
+function waitlistCorsHeaders(request, extraHeaders = {}) {
+  const requestOrigin = request.headers.get("Origin") || CANONICAL_ORIGIN;
+  const allowedOrigin = requestOrigin === CANONICAL_ORIGIN || requestOrigin === `https://${ALTERNATE_HOST}`
+    ? requestOrigin
+    : CANONICAL_ORIGIN;
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store, max-age=0",
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "600",
+    ...extraHeaders,
+  }), "/");
+
+  return headers;
+}
+
+function waitlistOptionsResponse(request, markerHeader) {
+  return new Response(null, {
+    status: 204,
+    headers: waitlistCorsHeaders(request, { [markerHeader]: WAITLIST_EDGE_VERSION }),
+  });
+}
+
+function waitlistJsonResponse(request, body, status = 200, extraHeaders = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: waitlistCorsHeaders(request, extraHeaders),
+  });
+}
+
+function cleanWaitlistString(value, maxLength = 160) {
+  return String(value ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function waitlistBoolean(value) {
+  return value === true || value === "true" || value === 1 || value === "1";
+}
+
+function normalizeWaitlistEmail(value) {
+  return cleanWaitlistString(value, 254).toLowerCase();
+}
+
+function isValidWaitlistEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function normalizeWaitlistPhone(value) {
+  const digits = cleanWaitlistString(value, 40).replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  if (digits.length >= 8 && digits.length <= 15) return `+${digits}`;
+  return "";
+}
+
+function cleanWaitlistUrl(value) {
+  const raw = cleanWaitlistString(value, 500);
+  if (!raw) return "";
+
+  try {
+    const candidate = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) || raw.startsWith("/")
+      ? raw
+      : `https://${raw}`;
+    const parsed = new URL(candidate, CANONICAL_ORIGIN);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return "";
+    return parsed.toString().slice(0, 500);
+  } catch {
+    return raw.slice(0, 300);
+  }
+}
+
+async function sha256Hex(value) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function buildWaitlistReference(normalizedEmail, now = new Date()) {
+  const seconds = Math.floor(now.getTime() / 1000).toString(36).toUpperCase();
+  const digest = await sha256Hex(`${normalizedEmail}:${seconds}`);
+  return `CS-FND-${seconds}-${digest.slice(0, 6).toUpperCase()}`;
+}
+
+async function buildProfileToken(subscriberId, normalizedEmail, referenceCode) {
+  const nonce = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+  const secret = (await sha256Hex(`${subscriberId}:${normalizedEmail}:${referenceCode}:${nonce}`)).slice(0, 32);
+  return `${subscriberId}.${secret}`;
+}
+
+function profileTokenSubscriberId(profileToken) {
+  const [subscriberId, secret] = cleanWaitlistString(profileToken, 120).split(".");
+  if (!/^[a-f0-9]{24}$/i.test(subscriberId || "")) return "";
+  if (!/^[a-f0-9]{16,64}$/i.test(secret || "")) return "";
+  return subscriberId;
+}
+
+function addDaysIso(now, days) {
+  return new Date(now.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
+}
+
+async function readWaitlistJson(request) {
+  const text = await request.text();
+  if (!text.trim()) return {};
+  if (text.length > 16 * 1024) {
+    throw new Error("payload_too_large");
+  }
+  return JSON.parse(text);
+}
+
+function waitlistEntityUrl(subscriberId = "") {
+  const suffix = subscriberId ? `/${encodeURIComponent(subscriberId)}` : "";
+  return `https://${BASE44_API_ORIGIN_HOST}/api/apps/${WAITLIST_BASE44_APP_ID}/entities/Subscriber${suffix}`;
+}
+
+async function base44SubscriberRequest(method, subscriberId, body) {
+  const headers = new Headers({ "Content-Type": "application/json" });
+  const init = { method, headers };
+  if (body) init.body = JSON.stringify(body);
+  return fetch(waitlistEntityUrl(subscriberId), init);
+}
+
+function isPrelaunchWaitlistHtml(html = "") {
+  return /PreLaunch Countdown|Founding Waitlist|founding waitlist|client-surge-systems-copy-ff10df8d\.base44\.app/i.test(String(html));
+}
+
+async function handleWaitlistSubscribe(request) {
+  if (request.method === "OPTIONS") {
+    return waitlistOptionsResponse(request, WAITLIST_SUBSCRIBE_HEADER);
+  }
+
+  let payload;
+  try {
+    payload = await readWaitlistJson(request);
+  } catch {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "Please check the form and try again." },
+      400,
+      { [WAITLIST_SUBSCRIBE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  if (cleanWaitlistString(payload.website_url, 240)) {
+    return waitlistJsonResponse(
+      request,
+      { success: true, ignored: true },
+      200,
+      { [WAITLIST_SUBSCRIBE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  const email = cleanWaitlistString(payload.email, 254);
+  const normalizedEmail = normalizeWaitlistEmail(email);
+  if (!isValidWaitlistEmail(normalizedEmail)) {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "Please enter a valid email address." },
+      400,
+      { [WAITLIST_SUBSCRIBE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const firstName = cleanWaitlistString(payload.first_name || payload.name, 80);
+  const phoneNumber = cleanWaitlistString(payload.phone_number || payload.phone, 40);
+  const normalizedPhone = normalizeWaitlistPhone(phoneNumber);
+  const referenceCode = await buildWaitlistReference(normalizedEmail, now);
+  const profileTokenExpiresAt = addDaysIso(now, 30);
+
+  const subscriberPayload = {
+    email,
+    normalized_email: normalizedEmail,
+    first_name: firstName,
+    phone_number: phoneNumber,
+    phone_normalized: normalizedPhone,
+    source: cleanWaitlistString(payload.source, 80) || "coming-soon",
+    original_source: cleanWaitlistString(payload.source, 80) || "coming-soon",
+    latest_source: cleanWaitlistString(payload.source, 80) || "coming-soon",
+    landing_page: cleanWaitlistString(payload.landing_page, 160) || "/",
+    referral_code: cleanWaitlistString(payload.referral_code, 120),
+    utm_source: cleanWaitlistString(payload.utm_source, 120),
+    utm_medium: cleanWaitlistString(payload.utm_medium, 120),
+    utm_campaign: cleanWaitlistString(payload.utm_campaign, 120),
+    utm_term: cleanWaitlistString(payload.utm_term, 120),
+    utm_content: cleanWaitlistString(payload.utm_content, 120),
+    marketing_consent: waitlistBoolean(payload.marketing_consent),
+    marketing_consent_at: waitlistBoolean(payload.marketing_consent) ? nowIso : null,
+    sms_consent: waitlistBoolean(payload.sms_consent),
+    sms_consent_at: waitlistBoolean(payload.sms_consent) ? nowIso : null,
+    consent_text_version: "prelaunch-2026-08",
+    email_status: "active",
+    sms_status: waitlistBoolean(payload.sms_consent) && normalizedPhone ? "active" : "inactive",
+    waitlist_status: "eligible",
+    eligibility_status: "eligible",
+    eligibility_assigned_at: nowIso,
+    eligibility_expires_at: "2026-09-08T06:59:00.000Z",
+    launch_at: "2026-09-01T07:00:00.000Z",
+    last_seen_at: nowIso,
+    reference_code: referenceCode,
+    offer_summary: "50% off your ClientSurge Systems setup fee at launch.",
+    profile_token_expires_at: profileTokenExpiresAt,
+  };
+
+  let createResponse;
+  let subscriber;
+  try {
+    createResponse = await base44SubscriberRequest("POST", "", subscriberPayload);
+    subscriber = await createResponse.json().catch(() => ({}));
+  } catch {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "We could not complete your signup right now. Please try again." },
+      503,
+      { [WAITLIST_SUBSCRIBE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  if (!createResponse.ok || !subscriber?.id) {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "We could not complete your signup right now. Please try again." },
+      503,
+      { [WAITLIST_SUBSCRIBE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  const profileToken = await buildProfileToken(subscriber.id, normalizedEmail, referenceCode);
+  const profileTokenHash = await sha256Hex(profileToken);
+  await base44SubscriberRequest("PUT", subscriber.id, {
+    profile_token_hash: profileTokenHash,
+    profile_token_expires_at: profileTokenExpiresAt,
+  }).catch(() => null);
+
+  return waitlistJsonResponse(
+    request,
+    {
+      success: true,
+      is_existing_subscriber: false,
+      subscriber_id: subscriber.id,
+      first_name: subscriber.first_name || firstName,
+      waitlist_position: subscriber.waitlist_position ?? null,
+      reference_code: subscriber.reference_code || referenceCode,
+      eligibility_status: subscriber.eligibility_status || "eligible",
+      offer_summary: subscriber.offer_summary || subscriberPayload.offer_summary,
+      launch_at: subscriber.launch_at || subscriberPayload.launch_at,
+      eligibility_expires_at: subscriber.eligibility_expires_at || subscriberPayload.eligibility_expires_at,
+      profile_token: profileToken,
+    },
+    200,
+    { [WAITLIST_SUBSCRIBE_HEADER]: WAITLIST_EDGE_VERSION },
+  );
+}
+
+async function handleWaitlistProfileUpdate(request) {
+  if (request.method === "OPTIONS") {
+    return waitlistOptionsResponse(request, WAITLIST_PROFILE_HEADER);
+  }
+
+  let payload;
+  try {
+    payload = await readWaitlistJson(request);
+  } catch {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "Please check the form and try again." },
+      400,
+      { [WAITLIST_PROFILE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  const profileToken = cleanWaitlistString(payload.profile_token, 120);
+  const subscriberId = profileTokenSubscriberId(profileToken);
+  if (!subscriberId) {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "Your profile session expired. Please join the waitlist again." },
+      403,
+      { [WAITLIST_PROFILE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  const lookupResponse = await base44SubscriberRequest("GET", subscriberId).catch(() => null);
+  const subscriber = lookupResponse?.ok ? await lookupResponse.json().catch(() => null) : null;
+  const profileTokenHash = await sha256Hex(profileToken);
+
+  if (!subscriber || subscriber.profile_token_hash !== profileTokenHash) {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "Your profile session expired. Please join the waitlist again." },
+      403,
+      { [WAITLIST_PROFILE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  if (subscriber.profile_token_expires_at && new Date(subscriber.profile_token_expires_at).getTime() < Date.now()) {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "Your profile session expired. Please join the waitlist again." },
+      410,
+      { [WAITLIST_PROFILE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  const nowIso = new Date().toISOString();
+  const updatePayload = {
+    company_name: cleanWaitlistString(payload.company_name, 160),
+    industry: cleanWaitlistString(payload.industry, 120),
+    website_url: cleanWaitlistUrl(payload.website_url),
+    primary_problem: cleanWaitlistString(payload.primary_problem, 500),
+    profile_completed_at: nowIso,
+    profile_token_used_at: nowIso,
+    last_seen_at: nowIso,
+  };
+
+  const updateResponse = await base44SubscriberRequest("PUT", subscriberId, updatePayload).catch(() => null);
+  if (!updateResponse?.ok) {
+    return waitlistJsonResponse(
+      request,
+      { success: false, error: "We could not save your profile right now. Please try again." },
+      503,
+      { [WAITLIST_PROFILE_HEADER]: WAITLIST_EDGE_VERSION },
+    );
+  }
+
+  return waitlistJsonResponse(
+    request,
+    { success: true, message: "Profile saved." },
+    200,
+    { [WAITLIST_PROFILE_HEADER]: WAITLIST_EDGE_VERSION },
+  );
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
 
     if (url.protocol === "http:" || url.hostname === ALTERNATE_HOST) {
       return canonicalRedirect(url);
+    }
+
+    if (isWaitlistSubscribeRequest(request, url)) {
+      return handleWaitlistSubscribe(request);
+    }
+
+    if (isWaitlistProfileRequest(request, url)) {
+      return handleWaitlistProfileUpdate(request);
     }
 
     if (isPrivateRoutePath(url.pathname)) {
@@ -1518,7 +1883,18 @@ export default {
     const headers = applySecurityHeaders(new Headers(originResponse.headers), url.pathname);
 
     if (shouldInjectStaticFallbackPaintGuard(request, originResponse)) {
-      let html = repairPublicRouteMetadata(await originResponse.text(), url.pathname);
+      let html = await originResponse.text();
+      if (isPrelaunchWaitlistHtml(html)) {
+        headers.set(PRELAUNCH_WAITLIST_ORIGIN_HEADER, WAITLIST_EDGE_VERSION);
+        headers.set("Cache-Control", "no-store, max-age=0");
+        return new Response(html, {
+          status: originResponse.status,
+          statusText: originResponse.statusText,
+          headers,
+        });
+      }
+
+      html = repairPublicRouteMetadata(html, url.pathname);
       html = injectPublicNavPolish(html);
       html = injectStaticFallbackPaintGuard(html);
       headers.set(STATIC_FALLBACK_PAINT_GUARD_HEADER, "edge-v1");
