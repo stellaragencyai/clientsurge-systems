@@ -1,4 +1,14 @@
 import productionSafeEntry from "./clientsurge-production-safe-entry.mjs";
+import {
+  ACTIVE_ENGAGEMENT_WINDOW_MS,
+  HEARTBEAT_INTERVAL_MS,
+  SESSION_ANALYTICS_HEADER,
+  SESSION_ANALYTICS_VERSION,
+  SESSION_EVENT_PATH,
+  SESSION_TIMEOUT_MS,
+  finalizeInactiveSessions,
+  handleSessionEvent,
+} from "./visitor-session-analytics.mjs";
 
 export const SITE_ORIGIN = "https://clientsurgesystems.com";
 export const WWW_ORIGIN = "https://www.clientsurgesystems.com";
@@ -7,7 +17,7 @@ export const EVENT_PATH = "/__cs_telegram_click";
 export const DIAGNOSTIC_PATH = "/__cs_telegram_click/diagnostic";
 export const TELEGRAM_TRACKER_SCRIPT_ID = "clientsurge-telegram-click-tracker";
 export const TELEGRAM_EDGE_HEADER = "x-clientsurge-telegram-tracker";
-export const TRACKING_VERSION = "2026-07-24-telegram-click-v2";
+export const TRACKING_VERSION = "2026-07-27-telegram-session-v1";
 
 const DEFAULT_ALLOWED_ORIGINS = [SITE_ORIGIN, WWW_ORIGIN];
 const MAX_PAYLOAD_BYTES = 8 * 1024;
@@ -95,6 +105,7 @@ function trackerScriptResponse(request, env) {
     "Content-Type": "application/javascript; charset=utf-8",
     "Cache-Control": "no-store, max-age=0",
     [TELEGRAM_EDGE_HEADER]: `script-${TRACKING_VERSION}`,
+    [SESSION_ANALYTICS_HEADER]: `script-${SESSION_ANALYTICS_VERSION}`,
   });
   const origin = requestOrigin(request);
   if (allowedOrigins(env).has(origin)) headers.set("Access-Control-Allow-Origin", origin);
@@ -486,6 +497,10 @@ export default {
       return handleTelegramEvent(request, env);
     }
 
+    if (url.pathname === SESSION_EVENT_PATH) {
+      return handleSessionEvent(request, env, createCorrelationId());
+    }
+
     const response = await productionSafeEntry.fetch(request, env, ctx);
     if (!shouldInjectTracker(request, response)) return response;
 
@@ -494,6 +509,7 @@ export default {
     headers.delete("content-encoding");
     headers.delete("etag");
     headers.set(TELEGRAM_EDGE_HEADER, `injected-${TRACKING_VERSION}`);
+    headers.set(SESSION_ANALYTICS_HEADER, `injected-${SESSION_ANALYTICS_VERSION}`);
     headers.set("Cache-Control", "no-store, max-age=0");
 
     const html = injectTelegramTracker(await response.text());
@@ -503,12 +519,27 @@ export default {
       headers,
     });
   },
+
+  async scheduled(controller, env, ctx) {
+    const scheduledAt = controller?.scheduledTime || Date.now();
+    const correlationId = `cron_${scheduledAt}`;
+    ctx.waitUntil(
+      finalizeInactiveSessions(env, correlationId, scheduledAt)
+        .then((result) => {
+          console.log(`[session-analytics:${correlationId}] finalized=${result.finalized || 0} ok=${result.ok}`);
+        })
+        .catch((error) => {
+          console.warn(`[session-analytics:${correlationId}] scheduled_error ${safeString(error?.message || error, "", 240)}`);
+        }),
+    );
+  },
 };
 
 export const TRACKER_JS = `
 (() => {
   if (window.__clientsurgeTelegramClickTracker) return;
   window.__clientsurgeTelegramClickTracker = true;
+  window.__clientsurgeSessionDurationTracker = true;
 
   const privatePath = /^\\/(admin|dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44|client-portal)(\\/|$)/i;
   const path = window.location.pathname || "/";
@@ -518,18 +549,32 @@ export const TRACKER_JS = `
   if (hostname.includes("preview-sandbox") || hostname.includes("base44.app") || hostname.includes("preview")) return;
 
   const EVENT_URL = window.location.origin + "${EVENT_PATH}";
+  const SESSION_EVENT_URL = window.location.origin + "${SESSION_EVENT_PATH}";
   const INTERNAL_KEY = "cs_internal_traffic";
-  const SESSION_KEY = "cs_telegram_session";
+  const LEGACY_CLICK_SESSION_KEY = "cs_telegram_session";
+  const SESSION_KEY = "cs_visitor_session";
   const VISITOR_KEY = "cs_visitor_id";
-  const SESSION_TIMEOUT = 30 * 60 * 1000;
+  const SESSION_TIMEOUT = ${SESSION_TIMEOUT_MS};
+  const HEARTBEAT_INTERVAL = ${HEARTBEAT_INTERVAL_MS};
+  const ACTIVE_WINDOW = ${ACTIVE_ENGAGEMENT_WINDOW_MS};
   const DEDUPE_WINDOW = 1500;
   let lastSignature = "";
   let lastSignatureAt = 0;
+  let activeSession = null;
+  let pageInstanceId = "";
+  let pageStartedAt = 0;
+  let lastCheckpointAt = 0;
+  let lastActivityAt = 0;
+  let hiddenAt = 0;
+  let pageElapsedMs = 0;
+  let pageVisibleMs = 0;
+  let pageEngagedMs = 0;
+  let lastHref = window.location.href;
 
   const params = new URLSearchParams(window.location.search);
-  if (params.get("internal") === "true") localStorage.setItem(INTERNAL_KEY, "true");
-  if (params.get("internal") === "false") localStorage.removeItem(INTERNAL_KEY);
-  if (localStorage.getItem(INTERNAL_KEY) === "true") return;
+  if (params.get("internal") === "true") writeLocalRaw(INTERNAL_KEY, "true");
+  if (params.get("internal") === "false") removeLocal(INTERNAL_KEY);
+  if (readLocalRaw(INTERNAL_KEY) === "true") return;
 
   const ua = navigator.userAgent || "";
   if (/bot|crawler|spider|crawling|slurp|ahrefs|semrush|gptbot|claudebot|facebookexternalhit|linkedinbot|bingpreview|pingdom|uptimerobot|headlesschrome|python-requests|curl|wget/i.test(ua)) return;
@@ -540,26 +585,50 @@ export const TRACKER_JS = `
       : prefix + "_" + Date.now() + "_" + Math.random().toString(16).slice(2);
   }
 
-  function read(key) {
+  function readLocalRaw(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+  }
+
+  function writeLocalRaw(key, value) {
+    try { localStorage.setItem(key, value); } catch {}
+  }
+
+  function removeLocal(key) {
+    try { localStorage.removeItem(key); } catch {}
+  }
+
+  function readLocalJson(key) {
     try { return JSON.parse(localStorage.getItem(key) || "null"); } catch { return null; }
   }
 
-  function write(key, value) {
+  function writeLocalJson(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
   }
 
+  function readSessionJson(key) {
+    try { return JSON.parse(sessionStorage.getItem(key) || "null"); } catch { return null; }
+  }
+
+  function writeSessionJson(key, value) {
+    try { sessionStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }
+
+  function removeSessionJson(key) {
+    try { sessionStorage.removeItem(key); } catch {}
+  }
+
   function getVisitorId() {
-    let visitorId = localStorage.getItem(VISITOR_KEY);
+    let visitorId = readLocalRaw(VISITOR_KEY);
     if (!visitorId) {
       visitorId = makeId("visitor");
-      localStorage.setItem(VISITOR_KEY, visitorId);
+      writeLocalRaw(VISITOR_KEY, visitorId);
     }
     return visitorId;
   }
 
   function getSession() {
     const now = Date.now();
-    let session = read(SESSION_KEY);
+    let session = activeSession || readSessionJson(SESSION_KEY);
     if (!session || !session.sessionId || now - Number(session.lastSeenAt || 0) > SESSION_TIMEOUT) {
       session = {
         sessionId: makeId("session"),
@@ -567,12 +636,27 @@ export const TRACKER_JS = `
         startedAt: now,
         lastSeenAt: now,
         landingPage: window.location.href,
-        referrer: document.referrer || ""
+        referrer: document.referrer || "",
+        startedSent: false
       };
     }
     session.lastSeenAt = now;
-    write(SESSION_KEY, session);
+    activeSession = session;
+    writeSessionJson(SESSION_KEY, session);
+    writeLocalJson(LEGACY_CLICK_SESSION_KEY, session);
     return session;
+  }
+
+  function resetSession() {
+    activeSession = null;
+    removeSessionJson(SESSION_KEY);
+  }
+
+  function rememberSession(session) {
+    activeSession = session;
+    session.lastSeenAt = Date.now();
+    writeSessionJson(SESSION_KEY, session);
+    writeLocalJson(LEGACY_CLICK_SESSION_KEY, session);
   }
 
   function normalizeEventName(value) {
@@ -605,6 +689,128 @@ export const TRACKER_JS = `
     const browser = /Edg\\//i.test(ua) ? "Edge" : /OPR\\//i.test(ua) ? "Opera" : /Chrome\\//i.test(ua) ? "Chrome" : /Safari\\//i.test(ua) && !/Chrome\\//i.test(ua) ? "Safari" : /Firefox\\//i.test(ua) ? "Firefox" : "Unknown browser";
     const os = /Windows/i.test(ua) ? "Windows" : /Mac OS X/i.test(ua) ? "macOS" : /iPhone|iPad|iPod/i.test(ua) ? "iOS" : /Android/i.test(ua) ? "Android" : /Linux/i.test(ua) ? "Linux" : "Unknown OS";
     return browser + " on " + os;
+  }
+
+  function clampPageMetrics() {
+    pageVisibleMs = Math.min(pageVisibleMs, pageElapsedMs);
+    pageEngagedMs = Math.min(pageEngagedMs, pageVisibleMs);
+  }
+
+  function checkpoint() {
+    const now = Date.now();
+    if (!lastCheckpointAt) lastCheckpointAt = now;
+    const delta = Math.max(0, now - lastCheckpointAt);
+    pageElapsedMs += delta;
+    if (!document.hidden) {
+      pageVisibleMs += delta;
+      if (now - lastActivityAt <= ACTIVE_WINDOW) pageEngagedMs += delta;
+    }
+    lastCheckpointAt = now;
+    clampPageMetrics();
+    const session = getSession();
+    rememberSession(session);
+    return now;
+  }
+
+  function markActivity() {
+    lastActivityAt = Date.now();
+  }
+
+  function sessionPayload(eventType, extra) {
+    const now = Date.now();
+    const session = getSession();
+    const url = window.location.href;
+    const payload = {
+      event_type: eventType,
+      event_id: makeId("session_evt"),
+      session_id: session.sessionId,
+      visitor_id: session.visitorId,
+      page_instance_id: pageInstanceId,
+      url,
+      path: window.location.pathname + window.location.search,
+      page_title: document.title || "",
+      referrer: session.referrer || document.referrer || "",
+      landing_url: session.landingPage || url,
+      landing_path: (() => {
+        try {
+          const landing = new URL(session.landingPage || url);
+          return landing.pathname + landing.search;
+        } catch {
+          return window.location.pathname + window.location.search;
+        }
+      })(),
+      language: navigator.language || "",
+      screen_resolution: screen && screen.width ? String(screen.width) + "x" + String(screen.height || "") : "",
+      device_type: deviceCategory(),
+      source: "edge_session_tracker_v1",
+      client_sent_at: now,
+      page_elapsed_ms: pageElapsedMs,
+      page_visible_ms: pageVisibleMs,
+      page_engaged_ms: pageEngagedMs,
+      session_elapsed_ms: Math.max(0, now - Number(session.startedAt || now)),
+      ...(extra || {})
+    };
+    return payload;
+  }
+
+  function sendSessionEvent(eventType, extra, preferBeacon) {
+    if (!pageInstanceId) return;
+    const payload = sessionPayload(eventType, extra);
+    const body = JSON.stringify(payload);
+    if (preferBeacon && navigator.sendBeacon) {
+      const blob = new Blob([body], { type: "application/json" });
+      if (navigator.sendBeacon(SESSION_EVENT_URL, blob)) return;
+    }
+    fetch(SESSION_EVENT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+    })
+      .then((response) => response.json().catch(() => null))
+      .then((data) => {
+        if (data && data.newSessionRequired) {
+          resetSession();
+          startCurrentPage("server_finalized");
+        }
+      })
+      .catch(() => {});
+  }
+
+  function startCurrentPage(reason) {
+    const now = Date.now();
+    const session = getSession();
+    pageInstanceId = makeId("page");
+    pageStartedAt = now;
+    lastCheckpointAt = now;
+    lastActivityAt = now;
+    hiddenAt = document.hidden ? now : 0;
+    pageElapsedMs = 0;
+    pageVisibleMs = 0;
+    pageEngagedMs = 0;
+    lastHref = window.location.href;
+
+    if (!session.startedSent) {
+      sendSessionEvent("session_start", { start_reason: reason || "new_session" });
+      session.startedSent = true;
+      rememberSession(session);
+    }
+    sendSessionEvent("page_start", { start_reason: reason || "page_load" });
+  }
+
+  function finishCurrentPage(eventType, exitReason, isFinal, preferBeacon) {
+    checkpoint();
+    sendSessionEvent(eventType, {
+      exit_reason: exitReason || "navigation_completed",
+      is_final: Boolean(isFinal)
+    }, preferBeacon);
+  }
+
+  function handleRouteChange() {
+    const nextHref = window.location.href;
+    if (nextHref === lastHref) return;
+    finishCurrentPage("route_change", "navigation_completed", false, true);
+    startCurrentPage("route_change");
   }
 
   function utmParams() {
@@ -667,6 +873,8 @@ export const TRACKER_JS = `
     lastSignatureAt = now;
 
     const session = getSession();
+    checkpoint();
+    sendSessionEvent("conversion", { conversion_type: eventName });
     sendPayload({
       event: "website_click",
       eventName,
@@ -685,7 +893,57 @@ export const TRACKER_JS = `
     });
   }
 
-  getSession();
+  startCurrentPage("page_load");
+  window.setInterval(function () {
+    if (!document.hidden) {
+      checkpoint();
+      sendSessionEvent("heartbeat");
+    }
+  }, HEARTBEAT_INTERVAL);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      hiddenAt = Date.now();
+      finishCurrentPage("page_hidden", "unknown", false, true);
+      return;
+    }
+    if (hiddenAt && Date.now() - hiddenAt > SESSION_TIMEOUT) {
+      finishCurrentPage("session_end", "browser_hidden_timeout", true, true);
+      resetSession();
+      startCurrentPage("visible_after_timeout");
+      return;
+    }
+    checkpoint();
+    sendSessionEvent("page_visible");
+  }, true);
+
+  window.addEventListener("pagehide", function () {
+    finishCurrentPage("page_exit", "explicit_exit", true, true);
+    finishCurrentPage("session_end", "explicit_exit", true, true);
+  }, true);
+
+  window.addEventListener("beforeunload", function () {
+    finishCurrentPage("page_exit", "explicit_exit", true, true);
+  }, true);
+
+  ["pointerdown", "touchstart", "keydown", "scroll"].forEach(function (eventName) {
+    document.addEventListener(eventName, markActivity, { capture: true, passive: true });
+  });
+
+  ["pushState", "replaceState"].forEach(function (methodName) {
+    const original = history[methodName];
+    if (typeof original !== "function") return;
+    history[methodName] = function () {
+      const result = original.apply(this, arguments);
+      window.setTimeout(handleRouteChange, 0);
+      return result;
+    };
+  });
+
+  window.addEventListener("popstate", function () {
+    window.setTimeout(handleRouteChange, 0);
+  }, true);
+
   document.addEventListener("click", function (event) {
     const el = event.target?.closest?.("a, button, [role='button'], [data-track-click]");
     if (!el) return;
