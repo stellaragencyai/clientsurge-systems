@@ -1,0 +1,67 @@
+{
+  "light": [
+    {
+      "name": "Homepage",
+      "path": "/",
+      "expect_status": [200],
+      "require_html": true,
+      "require_app_shell": true,
+      "contains_any": ["69dc4a79656fdba136d413d3", "ClientSurge Systems"]
+    },
+    {
+      "name": "Product signup",
+      "path": "/product-signup?package=growth_system",
+      "expect_status": [200],
+      "require_html": true,
+      "require_app_shell": true,
+      "contains_any": ["product-signup", "Complete your ClientSurge signup"]
+    },
+    {
+      "name": "Contact",
+      "path": "/contact",
+      "expect_status": [200],
+      "require_html": true,
+      "require_app_shell": true
+    },
+    {
+      "name": "Booking",
+      "path": "/book",
+      "expect_status": [200],
+      "require_html": true,
+      "require_app_shell": true
+    }
+  ],
+  "full": [
+    {"name": "Homepage", "path": "/", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Start", "path": "/start", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Store", "path": "/store", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "About", "path": "/about", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Blog", "path": "/blog", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Roofing", "path": "/roofing", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "HVAC", "path": "/hvac", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Plumbing", "path": "/plumbing", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Dental", "path": "/dental", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Med spa", "path": "/med-spa", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Chiropractic", "path": "/chiropractic", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Contractors", "path": "/contractors", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Industries", "path": "/industries", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Automations", "path": "/automations", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Missed-call text-back", "path": "/missed-call-text-back", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Lead capture automation", "path": "/lead-capture-automation", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "AI lead follow-up", "path": "/ai-lead-follow-up", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Appointment booking automation", "path": "/appointment-booking-automation", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Review automation", "path": "/review-automation", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Customer reactivation", "path": "/customer-reactivation", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Contact", "path": "/contact", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Booking", "path": "/book", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {"name": "Login", "path": "/login", "expect_status": [200], "require_html": true, "require_app_shell": true},
+    {
+      "name": "Product signup",
+      "path": "/product-signup?package=growth_system",
+      "expect_status": [200],
+      "require_html": true,
+      "require_app_shell": true,
+      "contains_any": ["product-signup", "Complete your ClientSurge signup"]
+    }
+  ]
+}

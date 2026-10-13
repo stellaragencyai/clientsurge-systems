@@ -1,0 +1,13 @@
+[Unit]
+Description=Check for new ClientSurge Base44 releases every three minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=3min
+RandomizedDelaySec=20s
+AccuracySec=15s
+Persistent=yes
+Unit=clientsurge-assurance@release.service
+
+[Install]
+WantedBy=timers.target

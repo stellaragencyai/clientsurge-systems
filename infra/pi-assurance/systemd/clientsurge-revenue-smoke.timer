@@ -1,0 +1,13 @@
+[Unit]
+Description=Run ClientSurge revenue-path smoke verification every six hours
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=6h
+RandomizedDelaySec=10min
+AccuracySec=1min
+Persistent=yes
+Unit=clientsurge-assurance@revenue.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=Run ClientSurge public watchdog every two minutes
+
+[Timer]
+OnBootSec=90s
+OnUnitActiveSec=2min
+RandomizedDelaySec=10s
+AccuracySec=10s
+Persistent=yes
+Unit=clientsurge-assurance@watchdog.service
+
+[Install]
+WantedBy=timers.target
