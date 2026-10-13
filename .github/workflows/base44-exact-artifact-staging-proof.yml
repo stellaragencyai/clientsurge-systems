@@ -1,0 +1,114 @@
+name: Base44 Exact Artifact Staging Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: "Git ref to build and deploy to staging"
+        required: true
+        default: "main"
+        type: string
+      staging_app_id:
+        description: "Non-production Base44 app ID"
+        required: true
+        type: string
+      staging_verify_url:
+        description: "Published URL for the staging Base44 app"
+        required: true
+        type: string
+      dry_run:
+        description: "Build, test, and stamp the artifact without deploying"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: base44-exact-artifact-staging-proof
+  cancel-in-progress: false
+
+jobs:
+  staging-proof:
+    name: Build exact commit and deploy to Base44 staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON }}
+      BASE_44_AUTH_JSON: ${{ secrets.BASE_44_AUTH_JSON }}
+      DEPLOYMENT_PROOF_PATH: tmp/base44-exact-artifact-staging-proof.json
+
+    steps:
+      - name: Check out requested source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+
+      - name: Record exact source commit
+        shell: bash
+        run: |
+          echo "SOURCE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "SOURCE_REF=$(git branch --show-current || true)" >> "$GITHUB_ENV"
+
+      - name: Reject the production app
+        shell: bash
+        run: |
+          if [ "${{ inputs.staging_app_id }}" = "69dc4a79656fdba136d413d3" ]; then
+            echo "This workflow is staging-only and refuses the production app ID." >&2
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install repository dependencies
+        run: npm ci
+
+      - name: Build, deploy, and prove exact staging artifact
+        shell: bash
+        run: |
+          args=(
+            --app-id "${{ inputs.staging_app_id }}"
+            --verify-url "${{ inputs.staging_verify_url }}"
+            --sha "$SOURCE_SHA"
+            --environment staging
+            --output "$DEPLOYMENT_PROOF_PATH"
+          )
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            args+=(--dry-run)
+          fi
+
+          node scripts/release/deploy-base44-exact-artifact.mjs "${args[@]}"
+
+      - name: Upload exact-artifact proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: base44-exact-artifact-staging-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tmp/base44-exact-artifact-staging-proof.json
+            dist/release.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Job summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## Base44 Exact Artifact Staging Proof" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source ref: ${{ inputs.source_ref }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source SHA: ${SOURCE_SHA:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Staging app: ${{ inputs.staging_app_id }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Verify URL: ${{ inputs.staging_verify_url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Dry run: ${{ inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Production publishing is intentionally disabled in Phase 1." >> "$GITHUB_STEP_SUMMARY"
